@@ -6,17 +6,17 @@ $(function () {
   });
   $("#search-btn").click(function () {
     let index = $("#search-index").val();
-    let url = "/result?roll=" + index;
+    let url = "/wf/result?roll=" + index;
     location.href = url;
   });
-  if (location.pathname == "/result") {
-    $("#roll").find("img").attr("src", "/static/back.png");
+  if (location.pathname == "/wf/result") {
+    $("#roll").find("img").attr("src", "/static/flipper_gacha/back.png");
   } else {
-    $("#roll").find("img").attr("src", "/static/roll.png");
+    $("#roll").find("img").attr("src", "/static/flipper_gacha/roll.png");
   }
   $("#roll").click(function () {
-    if (location.pathname == "/result") {
-      location.href = "/flipper";
+    if (location.pathname == "/wf/result") {
+      location.href = "/wf/flipper";
     } else {
       get_simulation();
     }
@@ -28,7 +28,7 @@ function display_reslut(json) {
   for (let index = 0; index < 10; index++) {
     $("#slot" + index).empty();
     $("#slot" + index).append(
-      "<img src='https://raw.githubusercontent.com/poswords/EliyaBot/master/public/img/assets/chars/" +
+      "<img src='https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/chars/" +
         json[index]["id"] +
         "/square_0.png'  style='width: 82px;height: 82px; background-color: white;'>"
     );
@@ -53,33 +53,33 @@ function display_reslut(json) {
     ((json[12]["all_three"] / json[12]["all_roll"]) * 100).toFixed(3) + "%"
   );
   $(".Fire").prepend(
-    "<img src = 'https://raw.githubusercontent.com/poswords/EliyaBot/master/public/img/assets/sprites/elements/element_red.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
+    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/elements/element_red.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
   );
   $(".Water").prepend(
-    "<img src = 'https://raw.githubusercontent.com/poswords/EliyaBot/master/public/img/assets/sprites/elements/element_blue.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
+    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/elements/element_blue.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
   );
   $(".Thunder").prepend(
-    "<img src = 'https://raw.githubusercontent.com/poswords/EliyaBot/master/public/img/assets/sprites/elements/element_yellow.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
+    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/elements/element_yellow.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
   );
   $(".Wind").prepend(
-    "<img src = 'https://raw.githubusercontent.com/poswords/EliyaBot/master/public/img/assets/sprites/elements/element_green.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
+    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/elements/element_green.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
   );
   $(".Light").prepend(
-    "<img src = 'https://raw.githubusercontent.com/poswords/EliyaBot/master/public/img/assets/sprites/elements/element_white.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
+    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/elements/element_white.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
   );
   $(".Dark").prepend(
-    "<img src = 'https://raw.githubusercontent.com/poswords/EliyaBot/master/public/img/assets/sprites/elements/element_black.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
+    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/elements/element_black.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
   );
   $(".rarity-5-pu").prepend(
     "<img src='https://i.pinimg.com/originals/0b/28/1b/0b281bc1f36f57e3b865ab2e4bac40ba.gif' style='width:100%;height:100%; position: absolute; top: 0px; right: 0px;'>"
   );
   setTimeout(function () {
     $("#roll").attr("disabled", false);
-  }, 1000);
+  }, 800);
 }
 async function get_simulation() {
   $("#roll").attr("disabled", true);
-  let url = "/roll";
+  let url = "/wf/roll";
   for (let index = 0; index < 10; index++) {
     let img_src =
       "https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png";

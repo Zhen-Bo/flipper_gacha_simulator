@@ -1,8 +1,8 @@
 {% extends 'layout.html' %}
 {% block head %}
 <title>彈射抽卡模擬</title>
-<link rel="icon" type="image/png" href="{{url_for('static',filename='start_stone.png')}}" />
-<script src="{{url_for('static',filename='roll.js')}}"></script>
+<link rel="icon" type="image/png" href="{{url_for('static',filename='flipper_gacha/start_stone.png')}}" />
+<script src="{{url_for('static',filename='flipper_gacha/roll.js')}}"></script>
 <style>
     html,
     body {
@@ -16,7 +16,7 @@
     }
 
     .rarity-3::after {
-        background-image: url(https://raw.githubusercontent.com/poswords/EliyaBot/master/public/img/assets/sprites/rarity/star3.png);
+        background-image: url(https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/rarity/star3.png);
         background-size: 55px 15px;
         display: inline-block;
         width: 55px;
@@ -33,7 +33,7 @@
     }
 
     .rarity-4::after {
-        background-image: url(https://raw.githubusercontent.com/poswords/EliyaBot/master/public/img/assets/sprites/rarity/star4.png);
+        background-image: url(https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/rarity/star4.png);
         background-size: 55px 15px;
         display: inline-block;
         width: 55px;
@@ -51,7 +51,7 @@
 
     .rarity-5::after,
     .rarity-5-pu::after {
-        background-image: url(https://raw.githubusercontent.com/poswords/EliyaBot/master/public/img/assets/sprites/rarity/star5.png);
+        background-image: url(https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/rarity/star5.png);
         background-size: 55px 15px;
         display: inline-block;
         width: 55px;
