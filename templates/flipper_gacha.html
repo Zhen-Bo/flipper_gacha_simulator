@@ -1,0 +1,262 @@
+{% extends 'layout.html' %}
+{% block head %}
+<title>彈射抽卡模擬</title>
+<link rel="icon" type="image/png" href="{{url_for('static',filename='start_stone.png')}}" />
+<script src="{{url_for('static',filename='roll.js')}}"></script>
+<style>
+    html,
+    body {
+        background-color: #242526;
+    }
+
+    .p-2 {
+        position: relative;
+        margin: 1%;
+        padding: 4px !important;
+    }
+
+    .rarity-3::after {
+        background-image: url(https://raw.githubusercontent.com/poswords/EliyaBot/master/public/img/assets/sprites/rarity/star3.png);
+        background-size: 55px 15px;
+        display: inline-block;
+        width: 55px;
+        height: 15px;
+        content: "";
+        background-color: #333333;
+        position: absolute;
+        bottom: 0px;
+        left: -5px;
+    }
+
+    .rarity-3 {
+        background-color: white !important;
+    }
+
+    .rarity-4::after {
+        background-image: url(https://raw.githubusercontent.com/poswords/EliyaBot/master/public/img/assets/sprites/rarity/star4.png);
+        background-size: 55px 15px;
+        display: inline-block;
+        width: 55px;
+        height: 15px;
+        content: "";
+        background-color: #333333;
+        position: absolute;
+        bottom: 0px;
+        left: -5px;
+    }
+
+    .rarity-4 {
+        background-color: gold !important;
+    }
+
+    .rarity-5::after,
+    .rarity-5-pu::after {
+        background-image: url(https://raw.githubusercontent.com/poswords/EliyaBot/master/public/img/assets/sprites/rarity/star5.png);
+        background-size: 55px 15px;
+        display: inline-block;
+        width: 55px;
+        height: 15px;
+        content: "";
+        background-color: #333333;
+        position: absolute;
+        bottom: 0px;
+        left: -5px;
+    }
+
+    .rarity-5 {
+        padding: 1rem;
+        position: relative;
+        background: conic-gradient(#fd004c,
+                #fe9000,
+                #fff020,
+                #3edf4b,
+                #3363ff,
+                #b102b7,
+                #fd004c);
+        padding: 3px;
+    }
+</style>
+
+{% if dev == True %}
+<script>
+    $(function () {
+        $("#pool").val('{{pool}}');
+        if ($("#pool").val() == "machine_police_girl") {
+            var pool_img = "https://truth.bahamut.com.tw/s01/202105/bd46063b958be185834eb2addfb07bcb.JPG";
+        } else if ($("#pool").val() == "Wind-pu") {
+            var pool_img = "https://tw.hicdn.beanfun.com/beanfun/WebImage/1630923065083.png";
+        }
+        $('#banner').attr('src', pool_img);
+        $("#pool").change(function () {
+            if ($("#pool").val() == "machine_police_girl") {
+                var pool_img =
+                    "https://truth.bahamut.com.tw/s01/202105/bd46063b958be185834eb2addfb07bcb.JPG";
+            } else if ($("#pool").val() == "Wind-pu") {
+                var pool_img = "https://tw.hicdn.beanfun.com/beanfun/WebImage/1630923065083.png";
+            }
+            $('#banner').attr('src', pool_img);
+        });
+    });
+</script>
+{%　endif　%}
+{% if result != undefined %}
+<script>
+    $(function () {
+        try{
+            let json = JSON.parse('{{ result | tojson | safe}}');
+            display_reslut(json);
+        }
+        catch{
+            console.log("0");
+        }
+    });
+</script>
+{% endif %}
+{% endblock%}
+
+{% block content %}
+<div class="container-fluid d-flex justify-content-center">
+    <div class=" ">
+        {% if dev == True %}
+        <div class="d-flex ">
+            <select style="width:100%;" name="pool" id="pool">
+                <option value="Wind-pu">風PU</option>
+                <option value="machine_police_girl">警察池</option>
+            </select>
+        </div>
+        <div class="d-flex ">
+            <img id="banner" style="width: 450px" alt="">
+        </div>
+        {% else %}
+        <div class="d-flex ">
+            <img id="banner" src="https://tw.hicdn.beanfun.com/beanfun/WebImage/1630923065083.png" style="width: 450px"
+                alt="">
+        </div>
+        {% endif %}
+        <div class=""
+            style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://tw.hicdn.beanfun.com/beanfun/WebImage/1606509847551.png');background-size:cover;background-repeat:   no-repeat;background-position: center center;">
+            <div class="d-flex  mb-3 align-content-center flex-wrap"></div>
+            <div class="d-flex justify-content-center mb-3 align-content-center flex-wrap">
+                <div id="slot0" class="p-2" style="background-color:white;">
+                    <img style="width: 82px;height: 82px;"
+                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
+                </div>
+                <div id="slot1" class="p-2" style="background-color:white;">
+                    <img style="width: 82px;height: 82px;"
+                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
+                </div>
+                <div id="slot2" class="p-2" style="background-color:white;">
+                    <img style="width: 82px;height: 82px;"
+                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
+                </div>
+            </div>
+            <div class="d-flex justify-content-center mb-3 align-content-center flex-wrap">
+                <div id="slot3" class="p-2" style="background-color:white;">
+                    <img style="width: 82px;height: 82px;"
+                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
+                </div>
+                <div id="slot4" class="p-2" style="background-color:white;">
+                    <img style="width: 82px;height: 82px;"
+                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
+                </div>
+                <div id="slot5" class="p-2" style="background-color:white;">
+                    <img style="width: 82px;height: 82px;"
+                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
+                </div>
+                <div id="slot6" class="p-2" style="background-color:white;">
+                    <img style="width: 82px;height: 82px;"
+                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
+                </div>
+            </div>
+            <div class="d-flex justify-content-center mb-3 align-content-center flex-wrap">
+                <div id="slot7" class="p-2" style="background-color:white;">
+                    <img style="width: 82px;height: 82px;"
+                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
+                </div>
+                <div id="slot8" class="p-2" style="background-color:white;">
+                    <img style="width: 82px;height: 82px;"
+                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
+                </div>
+                <div id="slot9" class="p-2" style="background-color:white;">
+                    <img style="width: 82px;height: 82px;"
+                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
+                </div>
+            </div>
+            <div class="d-flex justify-content-center align-content-center flex-wrap">
+                <p id="sim_desc" class="text-white text-center">此網站已模擬{{(total["all_roll"]/10)|int}}次<br>請點擊下方按鈕開始模擬</p>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center mb-3" style="background-color:white;">
+            <button id="roll" type="button" class="btn">
+                <img>
+            </button>
+        </div>
+        <div class="d-flex  mb-3">
+            <table id="result_table" class="table table-bordered" style="display: none;">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-white text-center">5星</th>
+                        <th scope="col" class="text-white text-center">4星</th>
+                        <th scope="col" class="text-white text-center">3星</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="five_sum" class="text-white text-center"></td>
+                        <td id="four_sum" class="text-white text-center"></td>
+                        <td id="three_sum" class="text-white text-center"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex  mb-3">
+            <div id="search-panel" class="input-group mb-3">
+                <input id="search-index" type="text" class="form-control" placeholder="模擬結果查詢" aria-label="模擬結果查詢"
+                    aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button id="search-btn" class="btn btn-success" type="button">查詢</button>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex  mb-3">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-white text-center">稀有度</th>
+                        <th scope="col" class="text-white text-center">總出貨次數</th>
+                        <th scope="col" class="text-white text-center">總出貨率</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-white text-center">5星</td>
+                        <td id="all_five" class="text-white text-center">{{total["all_five"]}}</td>
+                        <td id="five_rate" class="text-white text-center">
+                            {{ "%.3f"|format(total["all_five"]/total["all_roll"]*100) }}%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-white text-center">4星</td>
+                        <td id="all_four" class="text-white text-center">{{total["all_four"]}}</td>
+                        <td id="four_rate" class="text-white text-center">
+                            {{ "%.3f"|format(total["all_four"]/total["all_roll"]*100) }}%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-white text-center">3星</td>
+                        <td id="all_three" class="text-white text-center">{{total["all_three"]}}</td>
+                        <td id="three_rate" class="text-white text-center">
+                            {{ "%.3f"|format(total["all_three"]/total["all_roll"]*100) }}%</td>
+                    </tr>
+                    <tr>
+                        <td class="text-white text-center">統計</td>
+                        <td class="text-white text-center">{{total["all_roll"]}}</td>
+                        <td class="text-white text-center">{{ "%.3f"|format(total["all_roll"]/total["all_roll"]*100) }}%
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
