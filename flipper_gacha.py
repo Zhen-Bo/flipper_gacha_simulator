@@ -50,7 +50,7 @@ flipper_gacha_pool = gacha_pool(
 )
 
 # 可以改成讀取json
-pool_data = ["Wind-pu", "machine_police_girl"]
+pool_data = ["drawing_witch", "machine_police_girl"]
 
 
 def get_time():
