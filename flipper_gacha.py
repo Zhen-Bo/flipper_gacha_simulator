@@ -91,6 +91,8 @@ def search():
     roll = request.args.get("roll")
     if pool not in pool_data or pool is None or pool == "":
         pool = pool_data[0]
+    if not roll.isdigit():
+        abort(404)
     cur = mysql.connection.cursor()
     cur.execute(f"SELECT * FROM `{pool}` WHERE sim_index = {roll};")
     result = cur.fetchone()
