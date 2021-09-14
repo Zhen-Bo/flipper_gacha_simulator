@@ -168,13 +168,15 @@ def search():
 
 @app.route("/wf/roll")
 def gacha_row():
+    pool = request.args.get("pool")
+    if pool not in pool_data_detal.keys() or pool is None or pool == "":
+        pool = list(pool_data_detal)[0]
     now = get_time()
     try:
         client_ip = limit_key_func()
-        print(f"{now} : {client_id}")
+        print(f"{pool}_{now} : {client_id}")
     except:
         pass
-    pool = request.args.get("pool")
     if pool not in pool_data_detal.keys() or pool is None or pool == "":
         pool = list(pool_data_detal)[0]
     items = flipper_gacha_pool.gacha(pool, 10)

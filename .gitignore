@@ -2,6 +2,7 @@
 test.py
 log/
 # Byte-compiled / optimized / DLL files
+tempCodeRunnerFile.py
 .vscode
 __pycache__/
 *.py[cod]
