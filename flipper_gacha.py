@@ -42,7 +42,7 @@ def limit_key_func():
 
 
 limiter = flask_limiter.Limiter(
-    app, key_func=limit_key_func, default_limits=["80 per minute"]
+    app, key_func=limit_key_func, default_limits=["65 per minute"]
 )
 
 flipper_gacha_pool = gacha_pool(

@@ -1,7 +1,7 @@
 {
     "five_pu": [
-        {"name":"菈琪夏","id":"drawing_witch","attri":"Water","rarity":"5"},
-        {"name":"利普拉姆","id":"blade_dancer","attri":"Light","rarity":"5"}
+        {"name":"菈琪夏","id":"drawing_witch","attri":"Water","rarity":"5-pu"},
+        {"name":"利普拉姆","id":"blade_dancer","attri":"Light","rarity":"5-pu"}
     ],
     "5-pu":[
         "drawing_witch",
@@ -29,11 +29,11 @@
         {"name":"梅緹斯","id":"thunder_archer","attri":"Thunder","rarity":"5"},
         {"name":"稻穗","id":"fox_oracle","attri":"Thunder","rarity":"5"},
         {"name":"卡利歐斯托羅","id":"cagliostro","attri":"Thunder","rarity":"5"},
-        {"name":"米格里","id":"bigwing_shaman","attri":"Wind","rarity":"5-pu"},
-        {"name":"西微","id":"gentle_barten","attri":"Wind","rarity":"5-pu"},
-        {"name":"菲莉亞","id":"wind_oracle","attri":"Wind","rarity":"5-pu"},
-        {"name":"列恩","id":"mercenary","attri":"Wind","rarity":"5-pu"},
-        {"name":"希露媞","id":"wind_spgirl","attri":"Wind","rarity":"5-pu"},
+        {"name":"米格里","id":"bigwing_shaman","attri":"Wind","rarity":"5"},
+        {"name":"西微","id":"gentle_barten","attri":"Wind","rarity":"5"},
+        {"name":"菲莉亞","id":"wind_oracle","attri":"Wind","rarity":"5"},
+        {"name":"列恩","id":"mercenary","attri":"Wind","rarity":"5"},
+        {"name":"希露媞","id":"wind_spgirl","attri":"Wind","rarity":"5"},
         {"name":"貝瑞塔","id":"combat_soldier","attri":"Light","rarity":"5"},
         {"name":"塔吉斯","id":"starbreak_hunter","attri":"Light","rarity":"5"},
         {"name":"奈芙提姆","id":"ruin_girl","attri":"Light","rarity":"5"},
