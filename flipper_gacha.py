@@ -50,7 +50,7 @@ flipper_gacha_pool = gacha_pool(
 )
 
 # 可以改成讀取json
-pool_data = ["drawing_witch", "machine_police_girl"]
+pool_data_detal = {"drawing_witch": "水炭池", "machine_police_girl": "警察池"}
 
 
 def get_time():
@@ -68,10 +68,9 @@ def home():
 @app.route("/wf/flipper", methods=["GET"])
 @limiter.exempt
 def roll_display():
-    print(limit_key_func())
     pool = request.args.get("pool")
-    if pool not in pool_data or pool is None or pool == "":
-        pool = pool_data[0]
+    if pool not in pool_data_detal.keys() or pool is None or pool == "":
+        pool = list(pool_data_detal)[0]
     roll = request.values.get("roll")
     cur = mysql.connection.cursor()
     cur.execute(
@@ -81,7 +80,12 @@ def roll_display():
     if pool_roll_data["all_roll"] is None:
         for key, dic_item in pool_roll_data.items():
             pool_roll_data[key] = 1
-    return render_template("flipper_gacha.html", pool=pool, total=pool_roll_data)
+    return render_template(
+        "flipper_gacha.html",
+        pool=pool,
+        total=pool_roll_data,
+        pool_data=pool_data_detal,
+    )
 
 
 @app.route("/wf/result")
@@ -89,9 +93,27 @@ def roll_display():
 def search():
     pool = request.args.get("pool")
     roll = request.args.get("roll")
-    if pool not in pool_data or pool is None or pool == "":
-        pool = pool_data[0]
-    if not roll.isdigit():
+    data_mode = request.args.get("data_mode")
+    if pool not in pool_data_detal.keys() or pool is None or pool == "":
+        pool = list(pool_data_detal)[0]
+    if data_mode is not None and data_mode.lower() == "true":
+        sql = f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
+        cur = mysql.connection.cursor()
+        cur.execute(sql)
+        pool_roll_data = cur.fetchone()
+        cur.close()
+        if pool_roll_data["all_roll"] == None:
+            pool_roll_data = {
+                "all_five": 1,
+                "all_four": 1,
+                "all_three": 1,
+                "all_roll": 1,
+            }
+        else:
+            for key in pool_roll_data:
+                pool_roll_data[key] = int(pool_roll_data[key])
+        return jsonify(pool_roll_data)
+    if roll is None or not roll.isdigit():
         abort(404)
     cur = mysql.connection.cursor()
     cur.execute(f"SELECT * FROM `{pool}` WHERE sim_index = {roll};")
@@ -133,19 +155,29 @@ def search():
         cur.close()
         detal.append(pool_roll_data)
         return render_template(
-            "flipper_gacha.html", pool=pool, total=pool_roll_data, result=detal
+            "flipper_gacha.html",
+            pool=pool,
+            total=pool_roll_data,
+            pool_data=pool_data_detal,
+            result=detal,
         )
     else:
+        cur.close()
         abort(404)
 
 
 @app.route("/wf/roll")
 def gacha_row():
-    pool = request.args.get("pool")
-    if pool not in pool_data or pool is None or pool == "":
-        pool = pool_data[0]
-    items = flipper_gacha_pool.gacha(pool, 10)
     now = get_time()
+    try:
+        client_ip = limit_key_func()
+        print(f"{now} : {client_id}")
+    except:
+        pass
+    pool = request.args.get("pool")
+    if pool not in pool_data_detal.keys() or pool is None or pool == "":
+        pool = list(pool_data_detal)[0]
+    items = flipper_gacha_pool.gacha(pool, 10)
     sql = f"INSERT INTO `{app.config['MYSQL_DB']}`.`{pool}` (`roll_1`, `roll_2`, `roll_3`, `roll_4`, `roll_5`, `roll_6`, `roll_7`, `roll_8`, `roll_9`, `roll_10`, `five_count`, `four_count`, `three_count`,`seed`,`time`) VALUES ('{items[0]['id']}', '{items[1]['id']}', '{items[2]['id']}', '{items[3]['id']}', '{items[4]['id']}', '{items[5]['id']}', '{items[6]['id']}', '{items[7]['id']}', '{items[8]['id']}', '{items[9]['id']}', '{items[10]['5星']}', '{items[10]['4星']}', '{items[10]['3星']}', '{items[11]}','{now}');"
     cur = mysql.connection.cursor()
     cur.execute(sql)

@@ -1,24 +1,42 @@
 $(function () {
+  let uri = window.location.toString();
+  if (uri.indexOf("?") > 0) {
+    let clean_uri = uri.substring(0, uri.indexOf("?"));
+    window.history.replaceState({}, document.title, clean_uri);
+  }
   $("#search-index").keyup(function (event) {
-    if (event.keyCode === 13) {
+    if (
+      event.keyCode === 13 &&
+      !$("#search-btn").is(":disabled") &&
+      $("#search-index").val() != ""
+    ) {
       $("#search-btn").click();
     }
   });
+
   $("#search-btn").click(function () {
     let index = $("#search-index").val();
-    let url = "/wf/result?roll=" + index;
-    location.href = url;
+    $("#search-index").val("");
+    if (index != "" && index / 1 > 0) {
+      let url = `/wf/result?pool=${$("#pool").val()}&roll=${index}`;
+      $("#search-btn").attr("disabled", true);
+      location.href = url;
+    } else {
+      alert("輸入錯誤!");
+    }
   });
+
   if (location.pathname == "/wf/result") {
     $("#roll").find("img").attr("src", "/static/flipper_gacha/back.png");
   } else {
     $("#roll").find("img").attr("src", "/static/flipper_gacha/roll.png");
   }
+
   $("#roll").click(function () {
     if (location.pathname == "/wf/result") {
-      location.href = "/wf/flipper";
+      location.href = `/wf/flipper?pool=${$("#pool").val()}`;
     } else {
-      get_simulation();
+      get_simulation($("#pool").val());
     }
   });
 });
@@ -77,9 +95,9 @@ function display_reslut(json) {
     $("#roll").attr("disabled", false);
   }, 800);
 }
-async function get_simulation() {
+async function get_simulation(pool) {
   $("#roll").attr("disabled", true);
-  let url = "/wf/roll";
+  let url = "/wf/roll?pool=" + pool;
   for (let index = 0; index < 10; index++) {
     let img_src =
       "https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png";
@@ -95,4 +113,50 @@ async function get_simulation() {
   } catch (error) {
     console.log("Request Failed", error);
   }
+}
+
+function change_information(json) {
+  $("#sim_desc").html(
+    `此網站已模擬 ${(
+      json["all_roll"] / 10
+    ).toFixed()} 次<br>請點擊下方按鈕開始模擬`
+  );
+  for (let index = 0; index < 10; index++) {
+    $("#slot" + index).empty();
+    $("#slot" + index).append(
+      `<img style="width: 82px; height: 82px;" src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">`
+    );
+    $("#slot" + index).attr("class", "p-2");
+  }
+  $("#result_table").hide();
+  $("#all_five").text(json["all_five"]);
+  $("#five_rate").text(
+    ((json["all_five"] / json["all_roll"]) * 100).toFixed(3) + "%"
+  );
+  $("#all_four").text(json["all_four"]);
+  $("#four_rate").text(
+    ((json["all_four"] / json["all_roll"]) * 100).toFixed(3) + "%"
+  );
+  $("#all_three").text(json["all_three"]);
+  $("#three_rate").text(
+    ((json["all_three"] / json["all_roll"]) * 100).toFixed(3) + "%"
+  );
+  $("#all_roll").text(json["all_roll"]);
+  $("#roll_rate").text(
+    ((json["all_roll"] / json["all_roll"]) * 100).toFixed(3) + "%"
+  );
+}
+
+async function switch_pool(pool_id) {
+  let url = "/wf/result?pool=" + pool_id + "&data_mode=true";
+  try {
+    let response = await fetch(url);
+    let json = await response.json();
+    change_information(json);
+  } catch (error) {
+    console.log("Request Failed", error);
+  }
+  $("#pool").attr("disabled", false);
+  $("#roll").attr("disabled", false);
+  $("#search-btn").attr("disabled", false);
 }

@@ -2,7 +2,6 @@
 {% block head %}
 <title>彈射抽卡模擬</title>
 <link rel="icon" type="image/png" href="{{url_for('static',filename='flipper_gacha/start_stone.png')}}" />
-<script src="{{url_for('static',filename='flipper_gacha/roll.js')}}"></script>
 <style>
     html,
     body {
@@ -76,37 +75,13 @@
         padding: 3px;
     }
 </style>
-
-{% if dev == True %}
-<script>
-    $(function () {
-        $("#pool").val('{{pool}}');
-        if ($("#pool").val() == "machine_police_girl") {
-            var pool_img = "https://truth.bahamut.com.tw/s01/202105/bd46063b958be185834eb2addfb07bcb.JPG";
-        } else if ($("#pool").val() == "Wind-pu") {
-            var pool_img = "https://tw.hicdn.beanfun.com/beanfun/WebImage/1630923065083.png";
-        }
-        $('#banner').attr('src', pool_img);
-        $("#pool").change(function () {
-            if ($("#pool").val() == "machine_police_girl") {
-                var pool_img =
-                    "https://truth.bahamut.com.tw/s01/202105/bd46063b958be185834eb2addfb07bcb.JPG";
-            } else if ($("#pool").val() == "Wind-pu") {
-                var pool_img = "https://tw.hicdn.beanfun.com/beanfun/WebImage/1630923065083.png";
-            }
-            $('#banner').attr('src', pool_img);
-        });
-    });
-</script>
-{%　endif　%}
 {% if result != undefined %}
 <script>
     $(function () {
-        try{
+        try {
             let json = JSON.parse('{{ result | tojson | safe}}');
             display_reslut(json);
-        }
-        catch{
+        } catch {
             console.log("0");
         }
     });
@@ -117,70 +92,42 @@
 {% block content %}
 <div class="container-fluid d-flex justify-content-center">
     <div class=" ">
-        {% if dev == True %}
         <div class="d-flex ">
             <select style="width:100%;" name="pool" id="pool">
-                <option value="Wind-pu">風PU</option>
-                <option value="machine_police_girl">警察池</option>
+                {% for key,value in pool_data.items() %}
+                <option value="{{key}}">{{value}}</option>
+                {% endfor %}
             </select>
         </div>
         <div class="d-flex ">
-            <img id="banner" style="width: 450px" alt="">
+            <img id="banner" style="width: 450px; height: 236px;">
         </div>
-        {% else %}
-        <div class="d-flex ">
-            <img id="banner" src="https://tw.hicdn.beanfun.com/beanfun/WebImage/1630923065083.png" style="width: 450px"
-                alt="">
-        </div>
-        {% endif %}
         <div class=""
             style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://tw.hicdn.beanfun.com/beanfun/WebImage/1606509847551.png');background-size:cover;background-repeat:   no-repeat;background-position: center center;">
             <div class="d-flex  mb-3 align-content-center flex-wrap"></div>
             <div class="d-flex justify-content-center mb-3 align-content-center flex-wrap">
-                <div id="slot0" class="p-2" style="background-color:white;">
+                {% for i in range(0,3) %}
+                <div id="slot{{i}}" class="p-2" style="background-color:white;">
                     <img style="width: 82px;height: 82px;"
                         src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
                 </div>
-                <div id="slot1" class="p-2" style="background-color:white;">
-                    <img style="width: 82px;height: 82px;"
-                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
-                </div>
-                <div id="slot2" class="p-2" style="background-color:white;">
-                    <img style="width: 82px;height: 82px;"
-                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
-                </div>
+                {% endfor %}
             </div>
             <div class="d-flex justify-content-center mb-3 align-content-center flex-wrap">
-                <div id="slot3" class="p-2" style="background-color:white;">
+                {% for i in range(3,7) %}
+                <div id="slot{{i}}" class="p-2" style="background-color:white;">
                     <img style="width: 82px;height: 82px;"
                         src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
                 </div>
-                <div id="slot4" class="p-2" style="background-color:white;">
-                    <img style="width: 82px;height: 82px;"
-                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
-                </div>
-                <div id="slot5" class="p-2" style="background-color:white;">
-                    <img style="width: 82px;height: 82px;"
-                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
-                </div>
-                <div id="slot6" class="p-2" style="background-color:white;">
-                    <img style="width: 82px;height: 82px;"
-                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
-                </div>
+                {% endfor %}
             </div>
             <div class="d-flex justify-content-center mb-3 align-content-center flex-wrap">
-                <div id="slot7" class="p-2" style="background-color:white;">
+                {% for i in range(7,10) %}
+                <div id="slot{{i}}" class="p-2" style="background-color:white;">
                     <img style="width: 82px;height: 82px;"
                         src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
                 </div>
-                <div id="slot8" class="p-2" style="background-color:white;">
-                    <img style="width: 82px;height: 82px;"
-                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
-                </div>
-                <div id="slot9" class="p-2" style="background-color:white;">
-                    <img style="width: 82px;height: 82px;"
-                        src="https://lpc.opengameart.org/sites/default/files/TransparencyDark640.png">
-                </div>
+                {% endfor %}
             </div>
             <div class="d-flex justify-content-center align-content-center flex-wrap">
                 <p id="sim_desc" class="text-white text-center">此網站已模擬{{(total["all_roll"]/10)|int}}次<br>請點擊下方按鈕開始模擬</p>
@@ -250,8 +197,8 @@
                     </tr>
                     <tr>
                         <td class="text-white text-center">統計</td>
-                        <td class="text-white text-center">{{total["all_roll"]}}</td>
-                        <td class="text-white text-center">{{ "%.3f"|format(total["all_roll"]/total["all_roll"]*100) }}%
+                        <td id="all_roll" class="text-white text-center">{{total["all_roll"]}}</td>
+                        <td id="all_rate" class="text-white text-center">{{ "%.3f"|format(total["all_roll"]/total["all_roll"]*100) }}%
                         </td>
                     </tr>
                 </tbody>
@@ -259,4 +206,24 @@
         </div>
     </div>
 </div>
+<script src="{{url_for('static',filename='flipper_gacha/roll.js')}}"></script>
+<script>
+    $(function () {
+        $("#pool").val('{{pool}}');
+        var pool_img = "/static/flipper_gacha/pool_image/{{pool}}.png";
+        $('#banner').attr('src', pool_img);
+        $("#pool").change(function () {
+            $("#pool").attr("disabled", true);
+            $("#roll").attr("disabled", true);
+            $("#search-btn").attr("disabled", true);
+            if (location.pathname == "/wf/result") {
+                location.href = `/wf/flipper?pool=${$("#pool").val()}`;
+            } else {
+                var pool_img = "/static/flipper_gacha/pool_image/" + $("#pool").val() + ".png";
+                $('#banner').attr('src', pool_img);
+                switch_pool($("#pool").val());
+            }
+        });
+    });
+</script>
 {% endblock %}
