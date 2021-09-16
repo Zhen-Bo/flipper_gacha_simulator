@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block head %}
 <title>彈射抽卡模擬</title>
-<link rel="icon" type="image/png" href="{{url_for('static',filename='flipper_gacha/start_stone.png')}}" />
+<link rel="icon" type="image/png" href="{{url_for('static',filename='start_stone.png')}}" />
 <style>
     html,
     body {
@@ -15,7 +15,7 @@
     }
 
     .rarity-3::after {
-        background-image: url(https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/flipper_gacha/image/rarity/star3.png);
+        background-image: url(https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/rarity/star3.png);
         background-size: 55px 15px;
         display: inline-block;
         width: 55px;
@@ -32,7 +32,7 @@
     }
 
     .rarity-4::after {
-        background-image: url(https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/flipper_gacha/image/rarity/star4.png);
+        background-image: url(https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/rarity/star4.png);
         background-size: 55px 15px;
         display: inline-block;
         width: 55px;
@@ -50,7 +50,7 @@
 
     .rarity-5::after,
     .rarity-5-pu::after {
-        background-image: url(https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/flipper_gacha/image/rarity/star5.png);
+        background-image: url(https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/rarity/star5.png);
         background-size: 55px 15px;
         display: inline-block;
         width: 55px;
@@ -206,11 +206,11 @@
         </div>
     </div>
 </div>
-<script src="{{url_for('static',filename='flipper_gacha/roll.js')}}"></script>
+<script src="{{url_for('static',filename='roll.js')}}"></script>
 <script>
     $(function () {
         $("#pool").val('{{pool}}');
-        var pool_img = "https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/flipper_gacha/image/pool_image/{{pool}}.png";
+        var pool_img = "https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/pool_image/{{pool}}.png";
         $('#banner').attr('src', pool_img);
         $("#pool").change(function () {
             $("#pool").attr("disabled", true);
@@ -219,7 +219,7 @@
             if (location.pathname == "/wf/result") {
                 location.href = `/wf/flipper?pool=${$("#pool").val()}`;
             } else {
-                var pool_img = "https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/flipper_gacha/image/pool_image/" + $("#pool").val() + ".png";
+                var pool_img = "https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/pool_image/" + $("#pool").val() + ".png";
                 $('#banner').attr('src', pool_img);
                 switch_pool($("#pool").val());
             }

@@ -27,9 +27,9 @@ $(function () {
   });
 
   if (location.pathname == "/wf/result") {
-    $("#roll").find("img").attr("src", "/static/flipper_gacha/back.png");
+    $("#roll").find("img").attr("src", "/wf/static/back.png");
   } else {
-    $("#roll").find("img").attr("src", "/static/flipper_gacha/roll.png");
+    $("#roll").find("img").attr("src", "/wf/static/roll.png");
   }
 
   $("#roll").click(function () {
@@ -46,7 +46,7 @@ function display_reslut(json) {
   for (let index = 0; index < 10; index++) {
     $("#slot" + index).empty();
     $("#slot" + index).append(
-      "<img src='https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/flipper_gacha/image/chars/" +
+      "<img src='https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/chars/" +
         json[index]["id"] +
         "/square_0.png'  style='width: 82px;height: 82px; background-color: white;'>"
     );
@@ -71,22 +71,22 @@ function display_reslut(json) {
     ((json[12]["all_three"] / json[12]["all_roll"]) * 100).toFixed(3) + "%"
   );
   $(".Fire").prepend(
-    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/flipper_gacha/image/elements/element_red.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
+    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/elements/element_red.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
   );
   $(".Water").prepend(
-    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/flipper_gacha/image/elements/element_blue.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
+    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/elements/element_blue.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
   );
   $(".Thunder").prepend(
-    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/flipper_gacha/image/elements/element_yellow.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
+    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/elements/element_yellow.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
   );
   $(".Wind").prepend(
-    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/flipper_gacha/image/elements/element_green.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
+    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/elements/element_green.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
   );
   $(".Light").prepend(
-    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/flipper_gacha/image/elements/element_white.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
+    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/elements/element_white.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
   );
   $(".Dark").prepend(
-    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/flipper_gacha/image/elements/element_black.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
+    "<img src = 'https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/elements/element_black.png' style='width: 20px; height: 20px;position: absolute; top: 0px; right: 0px;background-color:white;'>"
   );
   $(".rarity-5-pu").prepend(
     "<img src='https://i.pinimg.com/originals/0b/28/1b/0b281bc1f36f57e3b865ab2e4bac40ba.gif' style='width:100%;height:100%; position: absolute; top: 0px; right: 0px;'>"

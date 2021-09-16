@@ -25,6 +25,7 @@ load_dotenv()
 app = Flask(__name__)
 app.config.update(
     JSON_AS_ASCII=False,
+    JSONIFY_MIMETYPE="application/json;charset=utf-8",
     SECRET_KEY=os.getenv("SECRET_KEY"),
     PERMANENT_SESSION_LIFETIME=timedelta(days=1),
     STATIC_FOLDER=os.getenv("STATIC_FOLDER"),
@@ -42,7 +43,7 @@ def limit_key_func():
 
 
 limiter = flask_limiter.Limiter(
-    app, key_func=limit_key_func, default_limits=["65 per minute"]
+    app, key_func=limit_key_func, default_limits=["80 per minute"]
 )
 
 flipper_gacha_pool = gacha_pool(
@@ -59,15 +60,17 @@ def get_time():
     return dt2.strftime("%Y-%m-%d %H:%M:%S")
 
 
-@app.route("/wf", methods=["GET"])
+@app.route("/", methods=["GET"])
 @limiter.exempt
 def home():
     return redirect(url_for("roll_display"))
 
 
-@app.route("/wf/flipper", methods=["GET"])
+@app.route("/flipper", methods=["GET", "POST"])
 @limiter.exempt
 def roll_display():
+    if "ip_seed" not in session.keys():
+        session["ip_seed"] = 0
     pool = request.args.get("pool")
     if pool not in pool_data_detal.keys() or pool is None or pool == "":
         pool = list(pool_data_detal)[0]
@@ -88,7 +91,7 @@ def roll_display():
     )
 
 
-@app.route("/wf/result")
+@app.route("/result")
 @limiter.exempt
 def search():
     pool = request.args.get("pool")
@@ -166,19 +169,29 @@ def search():
         abort(404)
 
 
-@app.route("/wf/roll")
+@app.route("/roll")
 def gacha_row():
     pool = request.args.get("pool")
+    ignore = request.args.get("ignore")
     if pool not in pool_data_detal.keys() or pool is None or pool == "":
         pool = list(pool_data_detal)[0]
     now = get_time()
-    try:
+    if ignore != true:
         client_ip = limit_key_func()
-        print(f"{pool}_{now} : {client_id}")
-    except:
-        pass
-    if pool not in pool_data_detal.keys() or pool is None or pool == "":
-        pool = list(pool_data_detal)[0]
+        print(f"{pool},{now},{client_ip}")
+        if "ip_seed" in session.keys():
+            if "." in client_ip:
+                # ip_v4
+                ip_slice = client_ip.split(".")
+            elif ":" in client_ip:
+                # ip_v6
+                ip_slice = client_ip.split(":")
+            ip_seed = 0
+            for num in ip_slice:
+                ip_seed += int(num[0], 16)
+        else:
+            return "請使用瀏覽器進行模擬抽卡\n如有疑慮請截圖後到巴哈主串附圖回報"
+        session["ip_seed"] = ip_seed
     items = flipper_gacha_pool.gacha(pool, 10)
     sql = f"INSERT INTO `{app.config['MYSQL_DB']}`.`{pool}` (`roll_1`, `roll_2`, `roll_3`, `roll_4`, `roll_5`, `roll_6`, `roll_7`, `roll_8`, `roll_9`, `roll_10`, `five_count`, `four_count`, `three_count`,`seed`,`time`) VALUES ('{items[0]['id']}', '{items[1]['id']}', '{items[2]['id']}', '{items[3]['id']}', '{items[4]['id']}', '{items[5]['id']}', '{items[6]['id']}', '{items[7]['id']}', '{items[8]['id']}', '{items[9]['id']}', '{items[10]['5星']}', '{items[10]['4星']}', '{items[10]['3星']}', '{items[11]}','{now}');"
     cur = mysql.connection.cursor()
