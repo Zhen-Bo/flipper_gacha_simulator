@@ -41,7 +41,11 @@ $(function () {
   });
 
   $("#refresh").click(function () {
+    $("#refresh").attr("disabled", true);
     switch_pool($("#pool").val());
+    setTimeout(function () {
+      $("#refresh").attr("disabled", false);
+    }, 500);
   });
 });
 
