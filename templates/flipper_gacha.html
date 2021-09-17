@@ -95,7 +95,7 @@
         <div class="d-flex ">
             <select style="width:100%;" name="pool" id="pool">
                 {% for key,value in pool_data.items() %}
-                <option value="{{key}}">{{value}}</option>
+                <option value="{{key}}">{{value['name']}}</option>
                 {% endfor %}
             </select>
             <button id="refresh" type="button" class="btn btn-secondary">
