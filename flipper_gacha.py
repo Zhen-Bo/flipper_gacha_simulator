@@ -180,7 +180,7 @@ def gacha_row():
     if pool not in pool_data_detal.keys() or pool is None or pool == "":
         pool = list(pool_data_detal)[0]
     now = get_time()
-    if ignore != true:
+    if ignore != "true":
         client_ip = limit_key_func()
         print(f"{pool},{now},{client_ip}")
         if "ip_seed" in session.keys():
@@ -196,7 +196,7 @@ def gacha_row():
         else:
             return "請使用瀏覽器進行模擬抽卡\n如有疑慮請截圖後到巴哈主串附圖回報"
         session["ip_seed"] = ip_seed
-    if pool != "Thunder-pu":
+    if "pu" not in pool:
         items = flipper_gacha_pool.gacha(pool, 10)
     else:
         items = flipper_gacha_pool.gacha_uncommon(pool, 10)
