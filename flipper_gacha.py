@@ -51,7 +51,11 @@ flipper_gacha_pool = gacha_pool(
 )
 
 # 可以改成讀取json
-pool_data_detal = {"drawing_witch": "水炭池", "machine_police_girl": "警察池"}
+pool_data_detal = {
+    "drawing_witch": "水炭池",
+    "Thunder-pu": "雷屬性精選",
+    "machine_police_girl": "警察池",
+}
 
 
 def get_time():
@@ -192,7 +196,10 @@ def gacha_row():
         else:
             return "請使用瀏覽器進行模擬抽卡\n如有疑慮請截圖後到巴哈主串附圖回報"
         session["ip_seed"] = ip_seed
-    items = flipper_gacha_pool.gacha(pool, 10)
+    if pool != "Thunder-pu":
+        items = flipper_gacha_pool.gacha(pool, 10)
+    else:
+        items = flipper_gacha_pool.gacha_uncommon(pool, 10)
     sql = f"INSERT INTO `{app.config['MYSQL_DB']}`.`{pool}` (`roll_1`, `roll_2`, `roll_3`, `roll_4`, `roll_5`, `roll_6`, `roll_7`, `roll_8`, `roll_9`, `roll_10`, `five_count`, `four_count`, `three_count`,`seed`,`time`) VALUES ('{items[0]['id']}', '{items[1]['id']}', '{items[2]['id']}', '{items[3]['id']}', '{items[4]['id']}', '{items[5]['id']}', '{items[6]['id']}', '{items[7]['id']}', '{items[8]['id']}', '{items[9]['id']}', '{items[10]['5星']}', '{items[10]['4星']}', '{items[10]['3星']}', '{items[11]}','{now}');"
     cur = mysql.connection.cursor()
     cur.execute(sql)
