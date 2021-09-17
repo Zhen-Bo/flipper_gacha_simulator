@@ -39,6 +39,10 @@ $(function () {
       get_simulation($("#pool").val());
     }
   });
+
+  $("#refresh").click(function () {
+    switch_pool($("#pool").val());
+  });
 });
 
 function display_reslut(json) {
