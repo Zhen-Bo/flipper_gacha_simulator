@@ -52,7 +52,7 @@ flipper_gacha_pool = gacha_pool(
 
 # 可以改成讀取json
 pool_data_detal = {
-    "drawing_witch": {"name": "水炭池", "type": "normal"},
+    # "drawing_witch": {"name": "水炭池", "type": "normal"},#關閉水炭池
     "Thunder-pu": {"name": "雷屬性精選", "type": "attribute"},
     "machine_police_girl": {"name": "警察池", "type": "normal"},
     "halfanv": {"name": "半周年禮黑", "type": "three_pu"},
