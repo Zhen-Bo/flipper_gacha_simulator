@@ -53,8 +53,8 @@ flipper_gacha_pool = gacha_pool(
 # 可以改成讀取json
 pool_data_detal = {
     # "drawing_witch": {"name": "水炭池", "type": "normal"},#關閉水炭池
-    "Thunder-pu": {"name": "雷屬性精選", "type": "attribute"},
-    "machine_police_girl": {"name": "警察池", "type": "normal"},
+    # "Thunder-pu": {"name": "雷屬性精選", "type": "attribute"},#關閉雷PU
+    "machine_police_girl": {"name": "警察池", "type": "single"},
     "halfanv": {"name": "半周年禮黑", "type": "three_pu"},
 }
 
@@ -195,6 +195,8 @@ def gacha_row():
         session["ip_seed"] = ip_seed
     if pool_data_detal[pool]["type"] == "normal":
         items = flipper_gacha_pool.gacha(pool, 10)
+    elif pool_data_detal[pool]["type"] == "single":
+        items = flipper_gacha_pool.gacha_single(pool, 10)
     elif pool_data_detal[pool]["type"] == "three_pu":
         items = flipper_gacha_pool.gacha_three(pool, 10)
     elif pool_data_detal[pool]["type"] == "attribute":
