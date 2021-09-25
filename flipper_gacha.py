@@ -101,6 +101,9 @@ def search():
     pool = request.args.get("pool")
     roll = request.args.get("roll")
     data_mode = request.args.get("data_mode")
+    get_pool = request.args.get("get_pool")
+    if get_pool is not None and get_pool.lower() == "true":
+        return jsonify(pool_data_detal)
     if pool not in pool_data_detal.keys() or pool is None or pool == "":
         pool = list(pool_data_detal)[0]
     if data_mode is not None and data_mode.lower() == "true":
@@ -188,8 +191,14 @@ def gacha_row():
             elif ":" in client_ip:
                 ip_slice = client_ip.split(":")
             ip_seed = 0
-            for num in ip_slice:
-                ip_seed += int(num[0], 16)
+            try:
+                for num in ip_slice:
+                    if num == "":
+                        continue
+                    ip_seed += int(num[0], 16)
+            except:
+                print(f"{client_ip} {ip_slice}")
+                return redirect(url_for("roll_display"))
         else:
             return "請使用瀏覽器進行模擬抽卡\n如有疑慮請截圖後到巴哈主串附圖回報"
         session["ip_seed"] = ip_seed
