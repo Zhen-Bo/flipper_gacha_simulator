@@ -1,24 +1,16 @@
 <template>
-  <!--  <v-card>-->
   <div>
     <v-toolbar
         color="primary"
         dark
         flat
     >
-      <!--      <v-app-bar-nav-icon></v-app-bar-nav-icon>-->
-
       <v-toolbar-title>彈射抽卡模擬</v-toolbar-title>
 
       <v-spacer></v-spacer>
-
-      <!--      <v-btn icon>-->
-      <!--        <v-icon>mdi-magnify</v-icon>-->
-      <!--      </v-btn>-->
-
-      <!--      <v-btn icon>-->
-      <!--        <v-icon>mdi-dots-vertical</v-icon>-->
-      <!--      </v-btn>-->
+            <v-btn icon href="https://github.com/Zhen-Bo/flipper_gacha_simulator/issues" target="_blank" >
+              <v-icon>mdi-bug</v-icon>
+            </v-btn>
 
       <template v-slot:extension>
         <v-tabs
@@ -44,18 +36,6 @@
         <v-img
             :src='`https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/pool_image/${item.name}.png`'
         >
-          <!--          <template v-slot:placeholder>-->
-          <!--            <v-row-->
-          <!--                class="fill-height ma-0"-->
-          <!--                align="center"-->
-          <!--                justify="center"-->
-          <!--            >-->
-          <!--              <v-progress-circular-->
-          <!--                  indeterminate-->
-          <!--                  color="grey lighten-5"-->
-          <!--              ></v-progress-circular>-->
-          <!--            </v-row>-->
-          <!--          </template>-->
         </v-img>
 
         <v-img
@@ -86,20 +66,13 @@
                     <template v-slot:default>
                       <thead>
                       <tr>
-                        <th class="text-center">
-                          5星
-                        </th>
-                        <th class="text-center">
-                          3星
-                        </th>
-                        <th class="text-center">
-                          2星
-                        </th>
+                        <th class="text-center">5星</th>
+                        <th class="text-center">3星</th>
+                        <th class="text-center">2星</th>
                       </tr>
                       </thead>
                       <tbody>
-                      <tr
-                      >
+                      <tr>
                         <td class="text-center">{{ resultReport[0] }}</td>
                         <td class="text-center">{{ resultReport[1] }}</td>
                         <td class="text-center">{{ resultReport[2] }}</td>
@@ -114,7 +87,7 @@
             </v-row>
 
 
-            <v-row class="justify-space-around">
+            <v-row class="justify-space-around mb-2" >
               <v-btn text>
 
               </v-btn>
@@ -128,14 +101,9 @@
           </v-container>
         </v-img>
 
-
-        <!--        <v-card flat>-->
-        <!--          <v-card-text v-text="text"></v-card-text>-->
-        <!--        </v-card>-->
       </v-tab-item>
     </v-tabs-items>
   </div>
-  <!--  </v-card>-->
 </template>
 
 <script>
