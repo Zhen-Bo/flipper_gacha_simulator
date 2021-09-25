@@ -178,6 +178,7 @@ def search():
 
 @app.route("/roll")
 def gacha_row():
+    info = {}
     pool = request.args.get("pool")
     ignore = request.args.get("ignore")
     if pool not in pool_data_detal.keys() or pool is None or pool == "":
@@ -227,10 +228,11 @@ def gacha_row():
     for key, item in pool_roll_data.items():
         pool_roll_data[key] = int(pool_roll_data[key])
     cur.close()
-    items = items[:-1]
-    items.append(times["sim_index"])
-    items.append(pool_roll_data)
-    return jsonify(items)
+    items = items[:-2]
+    info["data"] = items
+    info["total"] = times["sim_index"]
+    info["report"] = pool_roll_data
+    return jsonify(info)
 
 
 if __name__ == "__main__":
