@@ -32,7 +32,7 @@ app.config.update(
     MYSQL_HOST=os.getenv("SEVER_IP"),
     MYSQL_USER=os.getenv("DB_USER"),
     MYSQL_PASSWORD=os.getenv("DB_PASS"),
-    MYSQL_DB=os.getenv("DB_TABLE"),
+    MYSQL_DB=os.getenv("DB_BASE"),
     MYSQL_CURSORCLASS="DictCursor",
 )
 mysql = MySQL(app)
