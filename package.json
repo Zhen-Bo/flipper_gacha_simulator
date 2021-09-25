@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "flipper_gacha_simulator/node_modules/.bin/vue-cli-service serve",
-    "build": "flipper_gacha_simulator/node_modules/.bin/vue-cli-service build",
-    "lint": "flipper_gacha_simulator/node_modules/.bin/vue-cli-service lint"
+    "serve": "node_modules/.bin/vue-cli-service serve",
+    "build": "node_modules/.bin/vue-cli-service build",
+    "lint": "node_modules/.bin/vue-cli-service lint"
   },
   "dependencies": {
     "core-js": "^3.6.5",
