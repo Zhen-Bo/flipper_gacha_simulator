@@ -5,7 +5,7 @@ let resourceURL = process.env.VUE_APP_RESOURCE_URL || '';
  * @property {string} attri
  * @property {string} id
  * @property {string} name
- * @property {'5-up','5','4','3'} rarity
+ * @property {'5-pu','5','4','3'} rarity
  * */
 
 export default {
