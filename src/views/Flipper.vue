@@ -18,7 +18,7 @@
                   mobile-breakpoint="0"
                   hide-default-footer
               >
-                <template v-slot:body.append>
+                <template v-slot:foot>
                   <tr>
                     <td></td>
                     <td></td>
@@ -87,7 +87,6 @@ export default {
       API.roll(this.pool).then((rs) => {
         let report = { '3': 0, '4': 0, '5': 0 };
         let count = this.desserts[1] ? this.desserts[1] : { title: '總數目', star5: 0, star4: 0, star3: 0 };
-        let countTotal = 0;
 
         rs.data.forEach(i => {
           report[i.rarity]++;
@@ -96,7 +95,8 @@ export default {
         count.star5 += report['5'];
         count.star4 += report['4'];
         count.star3 += report['3'];
-        countTotal = count.star5 + count.star4 + count.star3;
+
+        let countTotal = count.star5 + count.star4 + count.star3;
         this.desserts = [
           { title: '本次', star5: report['5'], star4: report['4'], star3: report['3'] },
           count,
