@@ -26,7 +26,7 @@ export default {
   },
   data () {
     return {
-      result: [[], [], []]
+      result: this.splitToRow(this.characterList)
     };
   },
   methods: {
@@ -61,10 +61,7 @@ export default {
     }
   },
   watch: {
-    characterList (newValue, oldValue) {
-      console.log(newValue);
-      console.log(oldValue);
-
+    characterList (newValue) {
       this.result = this.splitToRow(newValue);
     }
   },
