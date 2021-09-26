@@ -10,6 +10,7 @@
       <tr>
         <td></td>
         <td></td>
+        <td></td>
         <td colspan="2" class="text-right">
           你已抽取{{ rollTotal }}次
         </td>
