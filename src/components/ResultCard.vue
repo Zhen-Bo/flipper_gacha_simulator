@@ -1,21 +1,16 @@
 <template>
-  <v-img
-      class="mt-2"
-      gradient="to top right, rgba(100,115,201,.33), rgba(25,32,72,.7)"
-      :src='`https://tw.hicdn.beanfun.com/beanfun/WebImage/1606509847551.png`'
-      height="300px"
-      width="440px"
-  >
-    <v-container class="mt-2">
-      <v-row class="justify-center mb-3" v-for="(row, index) in [3, 4, 3]" :key="`row_${index}_${row}`">
-        <character-icon v-for="n in row" :key="n"
-                        :attri="result[index][n]? result[index][n].attri: ''"
-                        :name="result[index][n]? result[index][n].name: ''"
-                        :id="result[index][n]? result[index][n].id: ''"
-                        :rarity="result[index][n]?result[index][n].rarity:''"/>
+    <v-container class="mt-2 resultCard pa-1">
+
+      <v-row justify="center" :class="index === 0 ? 'mb-2 mt-1' : 'mb-2'"
+             v-for="(row, index) in [3, 4, 3]" :key="`row_${index}_${row}`">
+
+         <character-icon v-for="n in row" :key="n"
+                          :attri="result[index][n]? result[index][n].attri: ''"
+                          :name="result[index][n]? result[index][n].name: ''"
+                          :id="result[index][n]? result[index][n].id: ''"
+                          :rarity="result[index][n]?result[index][n].rarity:''"/>
       </v-row>
     </v-container>
-  </v-img>
 </template>
 
 <script>
@@ -75,3 +70,16 @@ export default {
   },
 };
 </script>
+
+<style>
+.resultCard{
+  background-size: cover;
+  background-position: center;
+  background-image: repeating-linear-gradient(#d6d8dca8,#d6d8dca8),
+  repeating-conic-gradient(
+      hsla(0, 0%, 100%, 0.51) 0deg 15deg,
+      hsla(0,0%,100%,0) 0deg 30deg
+  ),
+  url("https://tw.hicdn.beanfun.com/beanfun/WebImage/1606509847551.png");
+}
+</style>
