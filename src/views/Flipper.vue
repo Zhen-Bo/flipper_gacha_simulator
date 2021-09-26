@@ -8,9 +8,9 @@
       <v-toolbar-title>彈射抽卡模擬</v-toolbar-title>
 
       <v-spacer></v-spacer>
-            <v-btn icon href="https://github.com/Zhen-Bo/flipper_gacha_simulator/issues" target="_blank" >
-              <v-icon>mdi-bug</v-icon>
-            </v-btn>
+      <v-btn icon href="https://github.com/Zhen-Bo/flipper_gacha_simulator/issues" target="_blank">
+        <v-icon>mdi-bug</v-icon>
+      </v-btn>
 
       <template v-slot:extension>
         <v-tabs
@@ -60,7 +60,8 @@
           <v-container class="justify-center mt-3">
             <v-row class="justify-center mb-3">
               <v-card width="400px" v-if="isRoll[tab]">
-                <v-card-text class="mb-0 pb-0">此結果為這個網站第 <span style="color: #ffcd76">{{ total }}</span> 次模擬</v-card-text>
+                <v-card-text class="mb-0 pb-0">此結果為這個網站第 <span style="color: #ffcd76">{{ total }}</span> 次模擬
+                </v-card-text>
                 <v-card-text>
                   <v-simple-table>
                     <template v-slot:default>
@@ -87,7 +88,7 @@
             </v-row>
 
 
-            <v-row class="justify-space-around mb-2" >
+            <v-row class="justify-space-around mb-2">
               <v-btn text>
 
               </v-btn>
@@ -107,7 +108,7 @@
 </template>
 
 <script>
-
+import Api from '../plugins/api';
 import RollButton from '@/components/RollButton';
 import CharacterIcon from '@/components/CharacterIcon';
 
@@ -120,7 +121,7 @@ export default {
       items: [
         { name: 'machine_police_girl', text: '警察池' }, { name: 'halfanv', text: '半周年禮黑' }
       ],
-      isRoll:[false, false],
+      isRoll: [false, false],
       text: 'Lorem ipsum dolor ',
       result: [[], [], []],
       resultReport: [0, 0, 0],
@@ -129,48 +130,14 @@ export default {
   },
   methods: {
     roll () {
-      //TODO call api
-      // fetch(`wf/roll?pool=machine_police_girl`)
-      //     .then(res => {res.json();})
-      //     .then(rs =>{
-      //       console.log(rs);
-      //     });
+      Api.roll(this.items[this.tab].name).then((rs) => {
 
-      let rs = [{ 'attri': 'Wind', 'id': 'tengu_girl', 'name': '琥羽', 'rarity': '4' }, {
-        'attri': 'Fire',
-        'id': 'half_oni_boy',
-        'name': '明日切丸',
-        'rarity': '4'
-      }, { 'attri': 'Wind', 'id': 'highlander', 'name': '艾凡', 'rarity': '3' }, {
-        'attri': 'Wind',
-        'id': 'birdman',
-        'name': '奧羅爾',
-        'rarity': '4'
-      }, { 'attri': 'Fire', 'id': 'pirates_girl', 'name': '瑪麗娜', 'rarity': '5' }, {
-        'attri': 'Wind',
-        'id': 'tiger_treasure_hunter',
-        'name': '咪亞',
-        'rarity': '4'
-      }, { 'attri': 'Fire', 'id': 'tradition_healer', 'name': '哈里莎', 'rarity': '3' }, {
-        'attri': 'Water',
-        'id': 'hard_face_soldier',
-        'name': '瓦魯達',
-        'rarity': '3'
-      }, { 'attri': 'Thunder', 'id': 'outlaw_panther', 'name': '黑', 'rarity': '3' }, {
-        'attri': 'Light',
-        'id': 'unicorn_lancer',
-        'name': '傑拉爾',
-        'rarity': '4'
-      }, { '3星': 4, '4星': 5, '5星': 1 }, 126494, {
-        'all_five': 63216,
-        'all_four': 405020,
-        'all_roll': 1264940,
-        'all_three': 796704
-      }];
-      let rollDate = [[], [], []];
+        let rollDate = [[], [], []];
+        let report = { '3': 0, '4': 0, '5': 0 };
 
-      rs.forEach((i, index) => {
-        if (i.attri) {
+        rs.data.forEach((i, index) => {
+          report[i.rarity]++;
+
           switch (true) {
             case index < 3:
               rollDate[0][index + 1] = i;
@@ -185,21 +152,13 @@ export default {
               //TODO Error;
               break;
           }
-          this.result = rollDate;
-          return;
-        }
+        });
 
-        if (i['3星']) {
-          this.resultReport = [i['3星'], i['4星'], i['5星']];
-        }
-
-        if(!isNaN(i)){
-          this.total = i;
-        }
-
+        this.total = rs.total;
+        this.resultReport = [report['5'], report['4'], report['3']];
+        this.result = rollDate;
+        this.isRoll[this.tab] = true;
       });
-
-      this.isRoll[this.tab] = true;
     }
   },
 };
