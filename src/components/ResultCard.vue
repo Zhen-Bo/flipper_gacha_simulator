@@ -34,7 +34,7 @@ export default {
       this.$emit('click');
     },
     /**
-     * @param {array<{attri: string, id: string, name: string, rarity:string}>} data
+     * @param {array<character>} data
      */
     splitToRow (data) {
       let rollDate = [[], [], []];

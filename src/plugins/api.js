@@ -1,11 +1,18 @@
 let baseURL = process.env.VUE_APP_HOST_NAME || '';
 let resourceURL = process.env.VUE_APP_RESOURCE_URL || '';
 
+/** @typedef  {Object} character
+ * @property {string} attri
+ * @property {string} id
+ * @property {string} name
+ * @property {string} rarity
+ * */
+
 export default {
   resourceURL,
   /**
    * @param {string} pool
-   * @returns {Promise<{data:Array<{attri: string, id: string, name: string, rarity:string}>, total:number, report: {all_five: number, all_four: number, all_roll: number, all_three: number}}>}
+   * @returns {Promise<{data:Array<character>, total:number, report: {all_five: number, all_four: number, all_roll: number, all_three: number}}>}
    */
   roll (pool) {
     return fetch(`${baseURL}/wf/roll?pool=${pool}`)
