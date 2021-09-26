@@ -186,23 +186,7 @@ def gacha_row():
     now = get_time()
     if ignore != os.getenv("IGNORE_TOKEN"):
         client_ip = limit_key_func()
-        if "ip_seed" in session.keys():
-            if "." in client_ip:
-                ip_slice = client_ip.split(".")
-            elif ":" in client_ip:
-                ip_slice = client_ip.split(":")
-            ip_seed = 0
-            try:
-                for num in ip_slice:
-                    if num == "":
-                        continue
-                    ip_seed += int(num[0], 16)
-            except:
-                print(f"{client_ip} {ip_slice}")
-                return redirect(url_for("roll_display"))
-        else:
-            return "請使用瀏覽器進行模擬抽卡\n如有疑慮請截圖後到巴哈主串附圖回報"
-        session["ip_seed"] = ip_seed
+        #
     else:
         client_ip = "ignore_token"
     if pool_data_detal[pool]["type"] == "normal":
