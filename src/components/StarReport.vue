@@ -29,6 +29,10 @@ export default {
     },
     desserts:{
       type: Array
+    },
+    fivePu:{
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -47,5 +51,9 @@ export default {
       ],
     };
   },
+  created () {
+    if(!this.fivePu) this.headers = this.headers.filter(rs => rs.value !== 'star5_up');
+
+  }
 };
 </script>
