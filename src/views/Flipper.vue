@@ -1,12 +1,26 @@
 <template>
   <div>
-    <v-img :src='`${resourceURL}/static/image/pool_image/${pool}.png`'></v-img>
-    <result-card :character-list="result"></result-card>
+
+    <v-img :src='`${resourceURL}/static/image/pool_image/${pool}.png`' max-width="600px"
+           :height="$vuetify.breakpoint.width / 1.9"
+           :load="load = false">
+      <template v-slot:placeholder>
+        <v-sheet>
+          <v-skeleton-loader
+              class="mx-auto"
+              :height="$vuetify.breakpoint.width / 1.9"
+              type="image"
+          ></v-skeleton-loader>
+        </v-sheet>
+      </template>
+    </v-img>
+
+    <result-card :character-list="result" :style="`zoom:${zoom}`"></result-card>
 
     <v-img :src='require("..\\assets\\bg.jpg")'>
       <v-container class="justify-center mt-3">
         <v-row class="justify-center mb-3">
-          <v-card width="400px" v-if="isRoll">
+          <v-card max-width="600px"  width="100%" v-if="isRoll">
             <v-card-text class="mb-0 pb-0">此結果為這個網站第 <span style="color: #ffcd76">{{ total }}</span> 次模擬
             </v-card-text>
             <v-card-text>
@@ -51,7 +65,9 @@ export default {
       result: [],
       total: 0,
       desserts: [],
-      rollTotal: 0
+      rollTotal: 0,
+      zoom: API.getZoom(this.$vuetify.breakpoint.width),
+      load: true
     };
   },
   methods: {
@@ -111,3 +127,11 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+::v-deep .v-skeleton-loader.v-skeleton-loader--is-loading {
+  .v-skeleton-loader__image {
+    height: 100%;
+  }
+}
+</style>
