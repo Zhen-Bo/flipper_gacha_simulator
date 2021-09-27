@@ -154,23 +154,17 @@ def search():
             ):
                 info["rarity"] = "5-pu"
             detal.append(info)
-        detal.append(rarity_total)
-        detal.append(result["sim_index"])
-        cur.execute(
-            f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
-        )
-        pool_roll_data = cur.fetchone()
-        for key, item in pool_roll_data.items():
-            pool_roll_data[key] = int(pool_roll_data[key])
-        cur.close()
-        detal.append(pool_roll_data)
-        return render_template(
-            "flipper_gacha.html",
-            pool=pool,
-            total=pool_roll_data,
-            pool_data=pool_data_detal,
-            result=detal,
-        )
+        # detal.append(rarity_total)
+        # detal.append(result["sim_index"])
+        # cur.execute(
+        #     f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
+        # )
+        # pool_roll_data = cur.fetchone()
+        # for key, item in pool_roll_data.items():
+        #     pool_roll_data[key] = int(pool_roll_data[key])
+        # cur.close()
+        # detal.append(pool_roll_data)
+        return jsonify({"data": detal, "sim_index": result["sim_index"]})
     else:
         cur.close()
         abort(404)
