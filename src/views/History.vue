@@ -1,20 +1,31 @@
 <template>
   <div class="grey lighten-4">
+    <v-sheet color="primary" class="pa-2">
+      <v-text-field
+          v-model="searchNumber"
+          label="模擬結果查詢"
+          placeholder="模擬結果查詢"
+          solo
+          dark
+          dense
+          hide-details
+          append-icon="mdi-magnify"
+          filled
+          solo-inverted
+          @click:append="search"
+          @keydown.enter="search"
+      ></v-text-field>
+    </v-sheet>
 
-    <v-container class="grey lighten-4">
-      <v-row>
-        <v-text-field
-            label="模擬結果查詢"
-            placeholder="模擬結果查詢"
-            solo
-            dense
-            hide-details
-            append-icon="mdi-magnify"
-        ></v-text-field>
-      </v-row>
-    </v-container>
+    <v-card class="mt-2" v-if="searchRS.data.length > 0">
+      <v-card-title class="pb-1">第{{ searchNumber }}次記錄
+      </v-card-title>
+      <v-card-text class="pl-0 pr-0 mt-0">
+        <result-card :style="`zoom:${zoom}`" :character-list="searchRS.data"></result-card>
+      </v-card-text>
+    </v-card>
 
-    <v-card class=" mt-2">
+    <v-card class="mt-2">
       <v-card-title>你的最近{{ total }}個記錄
         <v-spacer/>
         <tooltip-icon-button icon="mdi-delete" message="刪除記錄" @click="deleteHistory"/>
@@ -33,7 +44,7 @@
               :small="getTopStar(item.data) !== '5-pu'"
           >
             <strong>{{ item.dateTime  | moment('MMMM Do YYYY, h:mm:ss a') }}</strong>
-            <result-card style="zoom:0.8;" :character-list="item.data"></result-card>
+            <result-card :style="`zoom:${0.8 * zoom}`" :character-list="item.data"></result-card>
           </v-timeline-item>
         </v-timeline>
 
@@ -44,6 +55,7 @@
 </template>
 
 <script>
+import API from '@/plugins/api';
 import ResultCard from '@/components/ResultCard';
 import StarReport from '@/components/StarReport';
 import TooltipIconButton from '@/components/TooltipIconButton';
@@ -57,7 +69,10 @@ export default {
       /** @type {array<{data:array<character>,  dateTime:string}>} */
       items: [],
       reportDesserts: [],
-      dotColor: { '5-pu': 'red darken-3', '5': 'red lighten-2', '4': 'orange lighten-2', '3': 'white' }
+      dotColor: { '5-pu': 'red darken-3', '5': 'red lighten-2', '4': 'orange lighten-2', '3': 'white' },
+      zoom: API.getZoom(this.$vuetify.breakpoint.width),
+      searchNumber: '',
+      searchRS: { data: [] }
     };
   },
   props: {
@@ -67,6 +82,11 @@ export default {
     },
   },
   methods: {
+    search () {
+      API.search(this.pool, this.searchNumber).then((rs) => {
+        this.searchRS.data = rs.data;
+      });
+    },
     deleteHistory () {
       localStorage.removeItem(this.pool);
       this.loadLocalStorage();
