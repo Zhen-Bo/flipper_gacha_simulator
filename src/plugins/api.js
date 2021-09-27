@@ -22,8 +22,19 @@ export default {
     return fetch(`${baseURL}/wf/result?pool=${pool}&data_mode=true`)
       .then(res => res.json());
   },
+  search(pool, num){
+    return fetch(`${baseURL}/wf/result?pool=${pool}&roll=${num}`)
+      .then(res => res.json());
+  },
   pool(){
     return fetch(`${baseURL}/wf/result?get_pool=true`)
       .then(res => res.json());
+  },
+  getZoom(width){
+    console.log(width);
+    switch (true){
+      case width === 600:
+        return 1.5;
+    }
   }
 };
