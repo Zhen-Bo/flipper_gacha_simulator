@@ -18,8 +18,12 @@ export default {
     return fetch(`${baseURL}/wf/roll?pool=${pool}`)
       .then(res => res.json());
   },
+  /**
+   * @param {string} pool
+   * @returns {Promise<{all_five: number, all_four: number, all_roll: number, all_three: number}>}
+   */
   report (pool) {
-    return fetch(`${baseURL}/wf/result?pool=${pool}&data_mode=true`)
+    return fetch(`${baseURL}/wf/result/roll_data?pool=${pool}`)
       .then(res => res.json());
   },
   search(pool, num){
@@ -36,5 +40,8 @@ export default {
       case width === 600:
         return 1.5;
     }
+  },
+  round(num){
+    return (Math.round(num * 10000) / 100).toFixed(2);
   }
 };
