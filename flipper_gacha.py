@@ -21,7 +21,6 @@ from gacha import gacha_pool
 
 load_dotenv()
 
-
 app = Flask(__name__)
 app.config.update(
     JSON_AS_ASCII=False,
@@ -96,6 +95,27 @@ def roll_display():
     )
 
 
+@app.route("/result/roll_data")
+def get_pool_roll_data():
+    pool = request.args.get("pool")
+    sql = f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
+    cur = mysql.connection.cursor()
+    cur.execute(sql)
+    pool_roll_data = cur.fetchone()
+    cur.close()
+    if pool_roll_data["all_roll"] == None:
+        pool_roll_data = {
+            "all_five": 1,
+            "all_four": 1,
+            "all_three": 1,
+            "all_roll": 1,
+        }
+    else:
+        for key in pool_roll_data:
+            pool_roll_data[key] = int(pool_roll_data[key])
+    return jsonify(pool_roll_data)
+
+
 @app.route("/result")
 def search():
     pool = request.args.get("pool")
@@ -148,9 +168,9 @@ def search():
             elif character_dict["rarity"] == 5:
                 rarity_total["5星"] += 1
             if (
-                character_dict["rarity"] == 5
-                and character_dict["dev_id"]
-                in flipper_gacha_pool.char_list[pool]["5-pu"]
+                    character_dict["rarity"] == 5
+                    and character_dict["dev_id"]
+                    in flipper_gacha_pool.char_list[pool]["5-pu"]
             ):
                 info["rarity"] = "5-pu"
             detal.append(info)

@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <v-img :src='`${resourceURL}/static/image/pool_image/${pool}.png`' max-width="600px"
            :height="$vuetify.breakpoint.width / 1.9"
            :load="load = false">
@@ -91,10 +90,10 @@ export default {
           count,
           {
             title: '機率',
-            star5_up: `${(Math.round((count.star5_up / countTotal) * 10000) / 100).toFixed(2)}%`,
-            star5: `${(Math.round((count.star5 / countTotal) * 10000) / 100).toFixed(2)}%`,
-            star4: `${(Math.round((count.star4 / countTotal) * 10000) / 100).toFixed(2)}%`,
-            star3: `${(Math.round((count.star3 / countTotal) * 10000) / 100).toFixed(2)}%`
+            star5_up: `${API.round(count.star5_up / countTotal)}%`,
+            star5: `${API.round(count.star5 / countTotal)}%`,
+            star4: `${API.round(count.star4 / countTotal)}%`,
+            star3: `${API.round(count.star3 / countTotal)}%`
           },
         ];
 
