@@ -57,6 +57,21 @@ pool_data_detal = {
     "halfanv": {"name": "半周年禮黑", "type": "three_pu"},
 }
 
+# Add character temp
+character_list_temp = {}
+
+
+def get_character(name):
+    global character_list_temp
+    if not bool(character_list_temp):
+        cursor = mysql.connection.cursor()
+        cursor.execute(f"SELECT * FROM `character`;")
+        rs = cursor.fetchall()
+        for row in rs:
+            character_list_temp[row['dev_id']] = row
+        cursor.close()
+    return character_list_temp[name]
+
 
 def get_time():
     dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
@@ -125,73 +140,41 @@ def get_pool_roll_data():
 def search():
     pool = request.args.get("pool")
     roll = request.args.get("roll")
-    data_mode = request.args.get("data_mode")
-    get_pool = request.args.get("get_pool")
-    if get_pool is not None and get_pool.lower() == "true":
-        return jsonify(pool_data_detal)
     if pool not in pool_data_detal.keys() or pool is None or pool == "":
         pool = list(pool_data_detal)[0]
-    if data_mode is not None and data_mode.lower() == "true":
-        sql = f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
-        cur = mysql.connection.cursor()
-        cur.execute(sql)
-        pool_roll_data = cur.fetchone()
-        cur.close()
-        if pool_roll_data["all_roll"] == None:
-            pool_roll_data = {
-                "all_five": 1,
-                "all_four": 1,
-                "all_three": 1,
-                "all_roll": 1,
-            }
-        else:
-            for key in pool_roll_data:
-                pool_roll_data[key] = int(pool_roll_data[key])
-        return jsonify(pool_roll_data)
     if roll is None or not roll.isdigit():
         abort(404)
+
     cur = mysql.connection.cursor()
     cur.execute(f"SELECT * FROM `{pool}` WHERE sim_index = {roll};")
     result = cur.fetchone()
+    cur.close()
+
     if result is not None:
-        rarity_total = {"3星": 0, "4星": 0, "5星": 0}
-        detal = []
+        detail = []
+
         for index in range(1, 11):
             key = f"roll_{index}"
-            cur.execute(f"SELECT * FROM `character` WHERE dev_id = '{result[key]}';")
-            character_dict = cur.fetchone()
-            info = {
-                "name": f"{character_dict['name']}",
-                "id": f"{character_dict['dev_id']}",
-                "attri": f"{character_dict['attri']}",
-                "rarity": f"{character_dict['rarity']}",
-            }
-            if character_dict["rarity"] == 3:
-                rarity_total["3星"] += 1
-            elif character_dict["rarity"] == 4:
-                rarity_total["4星"] += 1
-            elif character_dict["rarity"] == 5:
-                rarity_total["5星"] += 1
+            info = get_character(result[key])
+
             if (
-                    character_dict["rarity"] == 5
-                    and character_dict["dev_id"]
+                    info["rarity"] == 5
+                    and info["dev_id"]
                     in flipper_gacha_pool.char_list[pool]["5-pu"]
             ):
                 info["rarity"] = "5-pu"
-            detal.append(info)
-        # detal.append(rarity_total)
-        # detal.append(result["sim_index"])
-        # cur.execute(
-        #     f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
-        # )
-        # pool_roll_data = cur.fetchone()
-        # for key, item in pool_roll_data.items():
-        #     pool_roll_data[key] = int(pool_roll_data[key])
-        # cur.close()
-        # detal.append(pool_roll_data)
-        return jsonify({"data": detal, "sim_index": result["sim_index"]})
+
+            #info['id'] = info['dev_id']
+            #del info['dev_id']
+
+            detail.append({
+                "name": f"{info['name']}",
+                "id": f"{info['dev_id']}",
+                "attri": f"{info['attri']}",
+                "rarity": f"{info['rarity']}",
+            })
+        return jsonify({"data": detail, "sim_index": result["sim_index"]})
     else:
-        cur.close()
         abort(404)
 
 
