@@ -25,13 +25,17 @@
       </v-btn>
 
     </v-bottom-navigation>
+
+    <snackbar ref="snackbar"></snackbar>
   </v-app>
 </template>
 
 <script>
 
+import Snackbar from '@/components/Snackbar';
 export default {
   name: 'App',
+  components: { Snackbar },
   data () {
     return {
       value: 'flipper',
@@ -40,7 +44,10 @@ export default {
   },
   created () {
     this.value = this.$route.name;
-  }
+  },
+  mounted () {
+    this.$root.$snackbar = this.$refs.snackbar;
+  },
 };
 </script>
 

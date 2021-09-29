@@ -73,6 +73,17 @@ def get_character(name):
     return character_list_temp[name]
 
 
+def check_pool(pool):
+    if pool not in pool_data_detal.keys() or pool is None or pool == "":
+        return list(pool_data_detal)[0]
+    return pool
+
+
+@app.errorhandler(404)
+def resource_not_found(e):
+    return jsonify(error=str(e)), 404
+
+
 def get_time():
     dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
     dt2 = dt1.astimezone(timezone(timedelta(hours=8)))  # 轉換時區 -> 東八區
@@ -138,10 +149,9 @@ def get_pool_roll_data():
 
 @app.route("/result")
 def search():
-    pool = request.args.get("pool")
+    pool = check_pool(request.args.get("pool"))
     roll = request.args.get("roll")
-    if pool not in pool_data_detal.keys() or pool is None or pool == "":
-        pool = list(pool_data_detal)[0]
+
     if roll is None or not roll.isdigit():
         abort(404)
 
@@ -172,7 +182,7 @@ def search():
             })
         return jsonify({"data": detail, "sim_index": result["sim_index"]})
     else:
-        abort(404)
+        abort(404, description="記錄不存在!")
 
 
 @app.route("/roll")

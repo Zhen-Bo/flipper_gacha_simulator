@@ -8,6 +8,7 @@
           solo
           dark
           dense
+          inputmode="numeric"
           hide-details
           append-icon="mdi-magnify"
           filled
@@ -84,10 +85,16 @@ export default {
   },
   methods: {
     search () {
-      API.search(this.pool, this.searchNumber).then((rs) => {
-        this.searchRS.data = rs.data;
-        this.searchNumberRS =  this.searchNumber;
-      });
+      API.search(this.pool, this.searchNumber)
+          .then((rs) => {
+            this.searchRS.data = rs.data;
+            this.searchNumberRS = this.searchNumber;
+          })
+          .catch((rs) => {
+            this.searchRS.data = [];
+            this.searchNumberRS = 0;
+            this.$root.$snackbar.Show(rs.message, 'error');
+          });
     },
     deleteHistory () {
       localStorage.removeItem(this.pool);

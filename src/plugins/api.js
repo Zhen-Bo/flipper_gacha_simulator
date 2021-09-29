@@ -8,6 +8,15 @@ let resourceURL = process.env.VUE_APP_RESOURCE_URL || '';
  * @property {'5-pu','5','4','3'} rarity
  * */
 
+const ResponseHandler = async (res) => {
+  if (res.status !== 200) {
+    let rs = await res.json();
+    console.log(rs.error);
+    throw new Error(rs.error);
+  }
+  return res.json();
+}
+
 export default {
   resourceURL,
   /**
@@ -26,22 +35,22 @@ export default {
     return fetch(`${baseURL}/wf/result/roll_data?pool=${pool}`)
       .then(res => res.json());
   },
-  search(pool, num){
+  search (pool, num) {
     return fetch(`${baseURL}/wf/result?pool=${pool}&roll=${num}`)
-      .then(res => res.json());
+      .then(async res => ResponseHandler(res) );
   },
-  pool(){
+  pool () {
     return fetch(`${baseURL}/wf/result/pool_list`)
       .then(res => res.json());
   },
-  getZoom(width){
+  getZoom (width) {
     console.log(width);
-    switch (true){
+    switch (true) {
       case width === 600:
         return 1.5;
     }
   },
-  round(num){
+  round (num) {
     return (Math.round(num * 10000) / 100).toFixed(2);
   }
 };
