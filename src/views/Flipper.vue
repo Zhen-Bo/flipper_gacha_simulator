@@ -18,15 +18,6 @@
 
     <v-img :src='require("..\\assets\\bg.jpg")'>
       <v-container class="justify-center mt-3">
-        <v-row class="justify-center mb-3">
-          <v-card max-width="600px"  width="100%" v-if="isRoll">
-            <v-card-text class="mb-0 pb-0">此結果為這個網站第 <span style="color: #ffcd76">{{ total }}</span> 次模擬
-            </v-card-text>
-            <v-card-text>
-              <star-report :desserts="desserts" :roll-total="rollTotal"/>
-            </v-card-text>
-          </v-card>
-        </v-row>
 
         <v-row class="justify-space-around mb-2">
           <v-btn text/>
@@ -36,6 +27,16 @@
               mdi-share-variant
             </v-icon>
           </v-btn>
+        </v-row>
+
+        <v-row class="justify-center mb-3">
+          <v-card max-width="600px"  width="100%" v-if="isRoll">
+            <v-card-text class="mb-0 pb-0">此結果為這個網站第 <span style="color: #ffcd76">{{ total }}</span> 次模擬
+            </v-card-text>
+            <v-card-text>
+              <star-report :desserts="desserts" :roll-total="rollTotal"/>
+            </v-card-text>
+          </v-card>
         </v-row>
       </v-container>
     </v-img>
