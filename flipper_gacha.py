@@ -18,6 +18,7 @@ import time
 from flask_mysqldb import MySQL, MySQLdb
 import flask_limiter
 from gacha import gacha_pool
+from datetime import date
 
 load_dotenv()
 
@@ -73,6 +74,53 @@ def get_character(name):
     return character_list_temp[name]
 
 
+# Add character temp
+character_report_temp = {}
+last_run_time = {}
+
+
+def get_character_report_temp(pool):
+    if pool not in character_report_temp or pool not in last_run_time \
+            or (datetime.now() - last_run_time[pool]).total_seconds() > 300:
+
+        sql = f'''select a.id as id, sum(a.total) as total from (
+    select roll_1 as id, count(*) as total from {app.config['MYSQL_DB']}.{pool} group by roll_1
+UNION all
+    select roll_2 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_2
+UNION all
+   select roll_3 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_3
+ UNION all
+    select roll_4 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_4
+UNION all
+    select roll_5 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_5
+ UNION all
+    select roll_6 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_6
+UNION all
+    select roll_7 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_7
+UNION all
+    select roll_8 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_8
+UNION all
+    select roll_9 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_9
+UNION all
+    select roll_10 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_10) a
+group by a.id'''
+
+        cur = mysql.connection.cursor()
+        cur.execute(sql)
+        character_report_data = cur.fetchall()
+        for row in character_report_data:
+            info = update_rarity_when_pu(pool, get_character(row['id']))
+            row['name'] = info['name']
+            row['attri'] = info['attri']
+            row['rarity'] = f"{info['rarity']}"
+            row['total'] = int(row['total'])
+
+        cur.close()
+        last_run_time[pool] = datetime.now()
+        character_report_temp[pool] = character_report_data
+    return character_report_temp[pool]
+
+
 def check_pool(pool):
     if pool not in pool_data_detal.keys() or pool is None or pool == "":
         return list(pool_data_detal)[0]
@@ -88,6 +136,25 @@ def get_time():
     dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
     dt2 = dt1.astimezone(timezone(timedelta(hours=8)))  # 轉換時區 -> 東八區
     return dt2.strftime("%Y-%m-%d %H:%M:%S")
+
+
+def update_rarity_when_pu(pool, info):
+    if (
+            info["rarity"] == 5
+            and info["dev_id"]
+            in flipper_gacha_pool.char_list[pool]["5-pu"]
+    ):
+        info["rarity"] = "5-pu"
+    return info
+
+
+def convert_to_character_output(char):
+    return {
+        "name": f"{char['name']}",
+        "id": f"{char['dev_id']}",
+        "attri": f"{char['attri']}",
+        "rarity": f"{char['rarity']}",
+    }
 
 
 @app.route("/", methods=["GET"])
@@ -147,6 +214,12 @@ def get_pool_roll_data():
     return jsonify(pool_roll_data)
 
 
+@app.route("/result/character_report")
+def character_report():
+    pool = check_pool(request.args.get("pool"))
+    return jsonify({"report": get_character_report_temp(pool), "last_run_time": last_run_time[pool]})
+
+
 @app.route("/result")
 def search():
     pool = check_pool(request.args.get("pool"))
@@ -165,21 +238,8 @@ def search():
 
         for index in range(1, 11):
             key = f"roll_{index}"
-            info = get_character(result[key])
-
-            if (
-                    info["rarity"] == 5
-                    and info["dev_id"]
-                    in flipper_gacha_pool.char_list[pool]["5-pu"]
-            ):
-                info["rarity"] = "5-pu"
-
-            detail.append({
-                "name": f"{info['name']}",
-                "id": f"{info['dev_id']}",
-                "attri": f"{info['attri']}",
-                "rarity": f"{info['rarity']}",
-            })
+            info = update_rarity_when_pu(pool, get_character(result[key]))
+            detail.append(convert_to_character_output(info))
         return jsonify({"data": detail, "sim_index": result["sim_index"]})
     else:
         abort(404, description="記錄不存在!")

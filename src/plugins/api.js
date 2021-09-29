@@ -50,6 +50,15 @@ export default {
         return 1.5;
     }
   },
+  /**
+   *
+   * @param pool
+   * @returns {Promise<{last_run_time:string, report:array<character & {total:number}>}>}
+   */
+  getCharacterReport(pool){
+    return fetch(`${baseURL}/wf/result/character_report?pool=${pool}`)
+      .then(async res => ResponseHandler(res) );
+  },
   round (num) {
     return (Math.round(num * 10000) / 100).toFixed(2);
   }

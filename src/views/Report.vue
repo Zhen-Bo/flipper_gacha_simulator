@@ -7,38 +7,46 @@
     </v-card>
 
     <v-card class="mt-2">
-      <v-card-title class="pb-0">最常出現的5星</v-card-title>
+      <v-card-title class="pb-0">角色出貸統計</v-card-title>
       <v-card-text class="pl-0 pr-0">
-        <v-data-table
-            :headers="headers1"
-            :items="desserts1"
-            :items-per-page="-1"
-            mobile-breakpoint="0"
-            hide-default-footer
+        <v-tabs
+            v-model="tab"
+            color="#fb8c00"
+            centered
         >
-          <template v-slot:item.character="{ item }">
-            <character-icon
-                :attri="item.character.attri"
-                :name="item.character.name"
-                :id="item.character.id"
-                :rarity="item.character.rarity"/>
-          </template>
+          <v-tab
+              v-for="item in tabItems"
+              :key="item.name"
+          >
+            {{ item.text }}
+          </v-tab>
+        </v-tabs>
 
-        </v-data-table>
+        <v-tabs-items v-model="tab">
+          <v-tab-item
+              v-for="item in tabItems"
+              :key="item.name"
+          >
+            <v-card flat>
+              <character-report :desserts="characterReportList[item.name]"/>
+            </v-card>
+          </v-tab-item>
+        </v-tabs-items>
+
+
       </v-card-text>
-
     </v-card>
   </div>
 </template>
 
 <script>
 import API from '@/plugins/api';
-import CharacterIcon from '@/components/CharacterIcon';
 import StarReport from '@/components/StarReport';
+import CharacterReport from '@/components/CharacterReport';
 
 export default {
   name: 'Report',
-  components: { StarReport, CharacterIcon },
+  components: { CharacterReport, StarReport },
   props: {
     pool: {
       type: String,
@@ -47,23 +55,22 @@ export default {
   },
   data () {
     return {
-      rollDesserts:[],
-      headers1: [
-        {
-          text: '角色',
-          align: 'start',
-          sortable: false,
-          value: 'character',
-        },
-        { text: '名稱', value: 'name' },
-        { text: '總出貨率', value: 'rate' }
-      ],
-      desserts1: [
-        { character: { 'name': '水前', 'id': 'onmyoji_boy', 'attri': 'Water', 'rarity': '5' }, name: '水前', rate: '40%' },
-        { character: { 'name': '列恩', 'id': 'mercenary', 'attri': 'Wind', 'rarity': '5' }, name: '風叔', rate: '30%' },
-        { character: { 'name': '瓦格納', 'id': 'fire_dragon', 'attri': 'Fire', 'rarity': '5' }, name: '火龍', rate: '20%' },
-      ],
+      rollDesserts: [],
+      lastUpdateTime: '',
+      characterReportList: [[], [], [], [], [], []],
+      tab: 5,
+      tabItems: [{ name: 5, text: '5 星' }, { name: 4, text: '4 星' }, { name: 3, text: '5 星' }]
     };
+  },
+  methods: {
+    /** @param {array<character & {total:number}>} list */
+    countRate (list) {
+      let total = list.map(rs => rs.total).reduce((a, b) => a + b);
+      list.forEach((rs) => {
+        rs.rate = `${API.round(rs.total / total)}%`;
+      });
+      return list;
+    }
   },
   created () {
     API.report(this.pool).then((rs) => {
@@ -78,6 +85,14 @@ export default {
         },
       ];
       console.log(this.rollDesserts);
+    });
+
+    API.getCharacterReport(this.pool).then((rs) => {
+      this.lastUpdateTime = new Date(rs.last_run_time);
+      this.characterReportList = [[], [], [],
+        this.countRate(rs.report.filter(rs => rs.rarity === '3')),
+        this.countRate(rs.report.filter(rs => rs.rarity === '4')),
+        this.countRate(rs.report.filter(rs => rs.rarity === '5' || rs.rarity === '5-pu'))];
     });
   }
 };
