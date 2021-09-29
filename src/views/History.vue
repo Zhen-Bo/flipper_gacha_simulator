@@ -18,7 +18,7 @@
     </v-sheet>
 
     <v-card class="mt-2" v-if="searchRS.data.length > 0">
-      <v-card-title class="pb-1">第{{ searchNumber }}次記錄
+      <v-card-title class="pb-1">第{{ searchNumberRS }}次記錄
       </v-card-title>
       <v-card-text class="pl-0 pr-0 mt-0">
         <result-card :style="`zoom:${zoom}`" :character-list="searchRS.data"></result-card>
@@ -72,6 +72,7 @@ export default {
       dotColor: { '5-pu': 'red darken-3', '5': 'red lighten-2', '4': 'orange lighten-2', '3': 'white' },
       zoom: API.getZoom(this.$vuetify.breakpoint.width),
       searchNumber: '',
+      searchNumberRS: '',
       searchRS: { data: [] }
     };
   },
@@ -85,6 +86,7 @@ export default {
     search () {
       API.search(this.pool, this.searchNumber).then((rs) => {
         this.searchRS.data = rs.data;
+        this.searchNumberRS =  this.searchNumber;
       });
     },
     deleteHistory () {
