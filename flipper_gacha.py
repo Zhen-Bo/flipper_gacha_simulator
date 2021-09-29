@@ -95,6 +95,11 @@ def roll_display():
     )
 
 
+@app.route("/result/pool_list")
+def get_pool_list():
+    return jsonify(pool_data_detal)
+
+
 @app.route("/result/roll_data")
 def get_pool_roll_data():
     pool = request.args.get("pool")

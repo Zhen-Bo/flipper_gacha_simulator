@@ -31,7 +31,7 @@ export default {
       .then(res => res.json());
   },
   pool(){
-    return fetch(`${baseURL}/wf/result?get_pool=true`)
+    return fetch(`${baseURL}/wf/result/pool_list`)
       .then(res => res.json());
   },
   getZoom(width){
