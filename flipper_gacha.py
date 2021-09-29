@@ -164,9 +164,6 @@ def search():
             ):
                 info["rarity"] = "5-pu"
 
-            #info['id'] = info['dev_id']
-            #del info['dev_id']
-
             detail.append({
                 "name": f"{info['name']}",
                 "id": f"{info['dev_id']}",
