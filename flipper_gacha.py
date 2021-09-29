@@ -123,12 +123,12 @@ def get_pool_roll_data():
     cur.execute(sql)
     pool_roll_data = cur.fetchone()
     cur.close()
-    if pool_roll_data["all_roll"] == None:
+    if pool_roll_data["all_roll"] is None:
         pool_roll_data = {
-            "all_five": 1,
-            "all_four": 1,
-            "all_three": 1,
-            "all_roll": 1,
+            "all_five": 0,
+            "all_four": 0,
+            "all_three": 0,
+            "all_roll": 0,
         }
     else:
         for key in pool_roll_data:
