@@ -165,6 +165,8 @@ def convert_to_character_output(char):
 
 @app.route("/result/pool_list")
 def get_pool_list():
+    if "ip_seed" not in session.keys():
+        session["ip_seed"] = 0
     return jsonify(pool_data_detal)
 
 
@@ -230,7 +232,17 @@ def gacha_row():
     now = get_time()
     if ignore != os.getenv("IGNORE_TOKEN"):
         client_ip = limit_key_func()
-        #
+        if "ip_seed" in session.keys():
+            if "." in client_ip:
+                ip_slice = client_ip.split(".")
+            elif ":" in client_ip:
+                ip_slice = client_ip.split(":")
+            ip_seed = 0
+            for num in ip_slice:
+                ip_seed += int(num[0], 16)
+        else:
+            return "請使用瀏覽器進行模擬抽卡\n如有疑慮請截圖後到巴哈主串附圖回報"
+        session["ip_seed"] = ip_seed
     else:
         client_ip = "ignore_token"
     if pool_data_detal[pool]["type"] == "normal":
