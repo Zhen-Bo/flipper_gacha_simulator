@@ -44,7 +44,6 @@ export default {
       .then(res => res.json());
   },
   getZoom (width) {
-    console.log(width);
     switch (true) {
       case width >= 600:
         return 1.5;
