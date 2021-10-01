@@ -50,7 +50,6 @@ export default {
         return style;
       }
 
-      console.log(this.rarity);
       style['border-color'] = 'white';
       return style;
     }
