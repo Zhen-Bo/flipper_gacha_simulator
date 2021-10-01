@@ -13,7 +13,7 @@
                          fixed
                          grow
     >
-      <v-btn :value="item.value" class="font-weight-black" v-for="item in bottomNav" :key="item.value" :to="{name: item.value}">
+      <v-btn :value="item.value" class="font-weight-black" v-for="item in bottomNav" :key="item.value" :to="{name: item.value}" @click="$vuetify.goTo(0,{duration:10,easing:'easeInOutCubic'})">
         <span>{{ item.name }}</span>
 
         <v-icon>{{ item.icon }}</v-icon>
