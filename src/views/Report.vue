@@ -84,7 +84,7 @@ export default {
           star3: `${API.round(rs.all_three / rs.all_roll)}%`
         },
       ];
-      console.log(this.rollDesserts);
+
     });
 
     API.getCharacterReport(this.pool).then((rs) => {
