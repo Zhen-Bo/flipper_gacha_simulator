@@ -1,7 +1,7 @@
 <template>
   <v-data-table
       :headers="headers"
-      :items="Desserts"
+      :items="desserts"
       :items-per-page="-1"
       hide-default-footer
       mobile-breakpoint="0"
@@ -28,7 +28,7 @@ export default {
   name: 'CharacterReport',
   components: { CharacterIcon },
   props: {
-    Desserts: {
+    desserts: {
       type: Array
     },
   },
