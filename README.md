@@ -13,7 +13,7 @@
 至於圖片素材部分皆來自 [poswords/EliyaBot](https://github.com/poswords/EliyaBot)
 由於該專案沒有 license 所以就放在這邊備註
 
-
+# 前端
 ## Project setup
 ```
 npm install
@@ -28,11 +28,3 @@ npm run serve
 ```
 npm run build
 ```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
