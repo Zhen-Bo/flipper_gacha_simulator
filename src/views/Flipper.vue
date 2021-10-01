@@ -21,13 +21,13 @@
       <v-container class="justify-center mt-3">
 
         <v-row class="justify-space-around mb-2">
-          <v-btn text/>
+<!--          <v-btn text/>-->
           <roll-button @click="roll"/>
-          <v-btn height="64px">
-            <v-icon>
-              mdi-share-variant
-            </v-icon>
-          </v-btn>
+<!--          <v-btn height="64px">-->
+<!--            <v-icon>-->
+<!--              mdi-share-variant-->
+<!--            </v-icon>-->
+<!--          </v-btn>-->
         </v-row>
 
         <v-row class="justify-center mb-3">
