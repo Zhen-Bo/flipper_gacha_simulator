@@ -28,7 +28,7 @@
         </v-tabs>
       </template>
     </v-toolbar>
-    <v-tabs-items v-model="tab">
+    <v-tabs-items v-model="tab" class="grey lighten-3">
       <v-tab-item v-for="item in items" :key="item.name">
         <router-view :pool="item.name"></router-view>
       </v-tab-item>

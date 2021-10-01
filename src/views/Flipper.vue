@@ -1,7 +1,8 @@
 <template>
-  <div>
+  <v-card>
     <v-img :src='`${resourceURL}/static/image/pool_image/${pool}.png`' max-width="600px"
            :height="$vuetify.breakpoint.width / 1.9"
+           max-height="315px"
            :load="load = false">
       <template v-slot:placeholder>
         <v-sheet>
@@ -40,7 +41,7 @@
         </v-row>
       </v-container>
     </v-img>
-  </div>
+  </v-card>
 </template>
 
 <script>

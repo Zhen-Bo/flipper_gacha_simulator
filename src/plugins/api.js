@@ -52,8 +52,12 @@ export default {
         return 1.2;
       case width >= 400:
         return 1;
+      case width >= 300:
+        return 0.7;
+      case width >= 200:
+        return 0.5;
       default:
-        return 0.9;
+        return 1.5;
     }
   },
   /**

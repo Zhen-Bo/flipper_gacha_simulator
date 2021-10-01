@@ -1,17 +1,12 @@
 <template>
-  <v-app>
-<!--    <v-app-bar-->
-<!--      app-->
-<!--      color="primary"-->
-<!--      dark-->
-<!--    >-->
-<!--    -->
-<!--    </v-app-bar>-->
+  <v-app style="background-color: #21252994">
 
     <v-main>
-      <router-view/>
+      <v-container style="max-width: 600px;background-color: #FFFFFF" class="pa-0">
+        <router-view/>
+        <div style="height: 60px;"></div>
+      </v-container>
     </v-main>
-    <div style="height: 60px"></div>
 
     <v-bottom-navigation v-model="value"
                          color="primary"
