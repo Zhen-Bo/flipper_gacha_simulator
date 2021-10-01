@@ -9,5 +9,14 @@ module.exports = {
         pathRewrite: {'^/wf' : ''}
       }
     }
+  },
+  css: {
+    loaderOptions: {
+      scss: {
+        additionalData: `
+          $VUE_APP_RESOURCE_URL: '${process.env.VUE_APP_RESOURCE_URL}';
+        `
+      }
+    }
   }
 }
