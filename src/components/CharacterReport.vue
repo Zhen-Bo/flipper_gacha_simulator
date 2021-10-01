@@ -11,6 +11,7 @@
     <template v-slot:item.character="{ item }">
       <character-icon
           class="ma-2"
+          style="width: 86px;"
           :attri="item.attri"
           :name="item.name"
           :id="item.id"
