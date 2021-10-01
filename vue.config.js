@@ -2,6 +2,15 @@ module.exports = {
   transpileDependencies: [
     'vuetify'
   ],
+  chainWebpack: (config) => {
+    if (process.env.NODE_ENV === 'production') {
+      config.plugin('html').tap((opts) => {
+        opts[0].filename = '../templates/index.html';
+        return opts;
+      });
+
+    }
+  },
   devServer: {
     proxy: {
       '/wf': {

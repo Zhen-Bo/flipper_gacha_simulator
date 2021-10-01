@@ -10,6 +10,7 @@ from flask import (
     Response,
     jsonify,
     abort,
+    send_from_directory
 )
 from datetime import datetime, timezone, timedelta
 import json
@@ -22,7 +23,11 @@ from datetime import date
 
 load_dotenv()
 
-app = Flask(__name__)
+# vue build file
+app = Flask(__name__,
+            static_folder="./dist",
+            template_folder="./templates")
+
 app.config.update(
     JSON_AS_ASCII=False,
     JSONIFY_MIMETYPE="application/json;charset=utf-8",
@@ -34,6 +39,7 @@ app.config.update(
     MYSQL_PASSWORD=os.getenv("DB_PASS"),
     MYSQL_DB=os.getenv("DB_NAME"),
     MYSQL_CURSORCLASS="DictCursor",
+    DATA_FOLDER=os.getenv("DATA_FOLDER"),
 )
 mysql = MySQL(app)
 
@@ -47,7 +53,7 @@ limiter = flask_limiter.Limiter(
 )
 
 flipper_gacha_pool = gacha_pool(
-    os.path.join(app.config["STATIC_FOLDER"], "flipper_pool")
+    os.path.join(app.config["DATA_FOLDER"], "flipper_pool")
 )
 
 # 可以改成讀取json
@@ -157,37 +163,6 @@ def convert_to_character_output(char):
     }
 
 
-@app.route("/", methods=["GET"])
-@limiter.exempt
-def home():
-    return redirect(url_for("roll_display"))
-
-
-@app.route("/flipper", methods=["GET", "POST"])
-@limiter.exempt
-def roll_display():
-    if "ip_seed" not in session.keys():
-        session["ip_seed"] = 0
-    pool = request.args.get("pool")
-    if pool not in pool_data_detal.keys() or pool is None or pool == "":
-        pool = list(pool_data_detal)[0]
-    roll = request.values.get("roll")
-    cur = mysql.connection.cursor()
-    cur.execute(
-        f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
-    )
-    pool_roll_data = cur.fetchone()
-    if pool_roll_data["all_roll"] is None:
-        for key, dic_item in pool_roll_data.items():
-            pool_roll_data[key] = 1
-    return render_template(
-        "flipper_gacha.html",
-        pool=pool,
-        total=pool_roll_data,
-        pool_data=pool_data_detal,
-    )
-
-
 @app.route("/result/pool_list")
 def get_pool_list():
     return jsonify(pool_data_detal)
@@ -286,6 +261,14 @@ def gacha_row():
     info["total"] = times["sim_index"]
     info["report"] = pool_roll_data
     return jsonify(info)
+
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    if os.path.isfile(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    return render_template("index.html")
 
 
 if __name__ == "__main__":
