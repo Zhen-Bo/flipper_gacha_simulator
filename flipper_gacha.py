@@ -10,6 +10,7 @@ from flask import (
     Response,
     jsonify,
     abort,
+    send_from_directory
 )
 from datetime import datetime, timezone, timedelta
 import json
@@ -18,11 +19,15 @@ import time
 from flask_mysqldb import MySQL, MySQLdb
 import flask_limiter
 from gacha import gacha_pool
+from datetime import date
 
 load_dotenv()
 
+# vue build file
+app = Flask(__name__,
+            static_folder="./dist",
+            template_folder="./templates")
 
-app = Flask(__name__)
 app.config.update(
     JSON_AS_ASCII=False,
     JSONIFY_MIMETYPE="application/json;charset=utf-8",
@@ -32,8 +37,9 @@ app.config.update(
     MYSQL_HOST=os.getenv("SEVER_IP"),
     MYSQL_USER=os.getenv("DB_USER"),
     MYSQL_PASSWORD=os.getenv("DB_PASS"),
-    MYSQL_DB=os.getenv("DB_TABLE"),
+    MYSQL_DB=os.getenv("DB_NAME"),
     MYSQL_CURSORCLASS="DictCursor",
+    DATA_FOLDER=os.getenv("DATA_FOLDER"),
 )
 mysql = MySQL(app)
 
@@ -47,7 +53,7 @@ limiter = flask_limiter.Limiter(
 )
 
 flipper_gacha_pool = gacha_pool(
-    os.path.join(app.config["STATIC_FOLDER"], "flipper_pool")
+    os.path.join(app.config["DATA_FOLDER"], "flipper_pool")
 )
 
 # 可以改成讀取json
@@ -58,6 +64,79 @@ pool_data_detal = {
     "halfanv": {"name": "半周年禮黑", "type": "three_pu"},
 }
 
+# Add character temp
+character_list_temp = {}
+
+
+def get_character(name):
+    global character_list_temp
+    if not bool(character_list_temp):
+        cursor = mysql.connection.cursor()
+        cursor.execute(f"SELECT * FROM `character`;")
+        rs = cursor.fetchall()
+        for row in rs:
+            character_list_temp[row['dev_id']] = row
+        cursor.close()
+    return character_list_temp[name]
+
+
+# Add character temp
+character_report_temp = {}
+last_run_time = {}
+
+
+def get_character_report_temp(pool):
+    if pool not in character_report_temp or pool not in last_run_time \
+            or (datetime.now() - last_run_time[pool]).total_seconds() > 300:
+
+        sql = f'''select a.id as id, sum(a.total) as total from (
+    select roll_1 as id, count(*) as total from {app.config['MYSQL_DB']}.{pool} group by roll_1
+UNION all
+    select roll_2 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_2
+UNION all
+   select roll_3 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_3
+ UNION all
+    select roll_4 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_4
+UNION all
+    select roll_5 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_5
+ UNION all
+    select roll_6 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_6
+UNION all
+    select roll_7 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_7
+UNION all
+    select roll_8 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_8
+UNION all
+    select roll_9 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_9
+UNION all
+    select roll_10 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_10) a
+group by a.id'''
+
+        cur = mysql.connection.cursor()
+        cur.execute(sql)
+        character_report_data = cur.fetchall()
+        for row in character_report_data:
+            info = update_rarity_when_pu(pool, get_character(row['id']))
+            row['name'] = info['name']
+            row['attri'] = info['attri']
+            row['rarity'] = f"{info['rarity']}"
+            row['total'] = int(row['total'])
+
+        cur.close()
+        last_run_time[pool] = datetime.now()
+        character_report_temp[pool] = character_report_data
+    return character_report_temp[pool]
+
+
+def check_pool(pool):
+    if pool not in pool_data_detal.keys() or pool is None or pool == "":
+        return list(pool_data_detal)[0]
+    return pool
+
+
+@app.errorhandler(404)
+def resource_not_found(e):
+    return jsonify(error=str(e)), 404
+
 
 def get_time():
     dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
@@ -65,116 +144,87 @@ def get_time():
     return dt2.strftime("%Y-%m-%d %H:%M:%S")
 
 
-@app.route("/", methods=["GET"])
-@limiter.exempt
-def home():
-    return redirect(url_for("roll_display"))
+def update_rarity_when_pu(pool, info):
+    if (
+            info["rarity"] == 5
+            and info["dev_id"]
+            in flipper_gacha_pool.char_list[pool]["5-pu"]
+    ):
+        info["rarity"] = "5-pu"
+    return info
 
 
-@app.route("/flipper", methods=["GET", "POST"])
-@limiter.exempt
-def roll_display():
+def convert_to_character_output(char):
+    return {
+        "name": f"{char['name']}",
+        "id": f"{char['dev_id']}",
+        "attri": f"{char['attri']}",
+        "rarity": f"{char['rarity']}",
+    }
+
+
+@app.route("/result/pool_list")
+def get_pool_list():
     if "ip_seed" not in session.keys():
         session["ip_seed"] = 0
+    return jsonify(pool_data_detal)
+
+
+@app.route("/result/roll_data")
+def get_pool_roll_data():
     pool = request.args.get("pool")
-    if pool not in pool_data_detal.keys() or pool is None or pool == "":
-        pool = list(pool_data_detal)[0]
-    roll = request.values.get("roll")
+    sql = f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
     cur = mysql.connection.cursor()
-    cur.execute(
-        f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
-    )
+    cur.execute(sql)
     pool_roll_data = cur.fetchone()
+    cur.close()
     if pool_roll_data["all_roll"] is None:
-        for key, dic_item in pool_roll_data.items():
-            pool_roll_data[key] = 1
-    return render_template(
-        "flipper_gacha.html",
-        pool=pool,
-        total=pool_roll_data,
-        pool_data=pool_data_detal,
-    )
+        pool_roll_data = {
+            "all_five": 0,
+            "all_four": 0,
+            "all_three": 0,
+            "all_roll": 0,
+        }
+    else:
+        for key in pool_roll_data:
+            pool_roll_data[key] = int(pool_roll_data[key])
+    return jsonify(pool_roll_data)
+
+
+@app.route("/result/character_report")
+def character_report():
+    pool = check_pool(request.args.get("pool"))
+    return jsonify({"report": get_character_report_temp(pool), "last_run_time": last_run_time[pool]})
 
 
 @app.route("/result")
 def search():
-    pool = request.args.get("pool")
+    pool = check_pool(request.args.get("pool"))
     roll = request.args.get("roll")
-    data_mode = request.args.get("data_mode")
-    if pool not in pool_data_detal.keys() or pool is None or pool == "":
-        pool = list(pool_data_detal)[0]
-    if data_mode is not None and data_mode.lower() == "true":
-        sql = f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
-        cur = mysql.connection.cursor()
-        cur.execute(sql)
-        pool_roll_data = cur.fetchone()
-        cur.close()
-        if pool_roll_data["all_roll"] == None:
-            pool_roll_data = {
-                "all_five": 1,
-                "all_four": 1,
-                "all_three": 1,
-                "all_roll": 1,
-            }
-        else:
-            for key in pool_roll_data:
-                pool_roll_data[key] = int(pool_roll_data[key])
-        return jsonify(pool_roll_data)
+
     if roll is None or not roll.isdigit():
         abort(404)
+
     cur = mysql.connection.cursor()
     cur.execute(f"SELECT * FROM `{pool}` WHERE sim_index = {roll};")
     result = cur.fetchone()
+    cur.close()
+
     if result is not None:
-        rarity_total = {"3星": 0, "4星": 0, "5星": 0}
-        detal = []
+        detail = []
+
         for index in range(1, 11):
             key = f"roll_{index}"
-            cur.execute(f"SELECT * FROM `character` WHERE dev_id = '{result[key]}';")
-            character_dict = cur.fetchone()
-            info = {
-                "name": f"{character_dict['name']}",
-                "id": f"{character_dict['dev_id']}",
-                "attri": f"{character_dict['attri']}",
-                "rarity": f"{character_dict['rarity']}",
-            }
-            if character_dict["rarity"] == 3:
-                rarity_total["3星"] += 1
-            elif character_dict["rarity"] == 4:
-                rarity_total["4星"] += 1
-            elif character_dict["rarity"] == 5:
-                rarity_total["5星"] += 1
-            if (
-                character_dict["rarity"] == 5
-                and character_dict["dev_id"]
-                in flipper_gacha_pool.char_list[pool]["5-pu"]
-            ):
-                info["rarity"] = "5-pu"
-            detal.append(info)
-        detal.append(rarity_total)
-        detal.append(result["sim_index"])
-        cur.execute(
-            f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
-        )
-        pool_roll_data = cur.fetchone()
-        for key, item in pool_roll_data.items():
-            pool_roll_data[key] = int(pool_roll_data[key])
-        cur.close()
-        detal.append(pool_roll_data)
-        return render_template(
-            "flipper_gacha.html",
-            pool=pool,
-            total=pool_roll_data,
-            pool_data=pool_data_detal,
-            result=detal,
-        )
+            info = update_rarity_when_pu(pool, get_character(result[key]))
+            detail.append(convert_to_character_output(info))
+        return jsonify({"data": detail, "sim_index": result["sim_index"]})
     else:
-        cur.close()
-        abort(404)
+        abort(404, description="記錄不存在!")
 
 
 @app.route("/roll")
 def gacha_row():
+    info = {}
     pool = request.args.get("pool")
     ignore = request.args.get("ignore")
     if pool not in pool_data_detal.keys() or pool is None or pool == "":
@@ -193,6 +243,8 @@ def gacha_row():
         else:
             return "請使用瀏覽器進行模擬抽卡\n如有疑慮請截圖後到巴哈主串附圖回報"
         session["ip_seed"] = ip_seed
+    else:
+        client_ip = "ignore_token"
     if pool_data_detal[pool]["type"] == "normal":
         items = flipper_gacha_pool.gacha(pool, 10)
     elif pool_data_detal[pool]["type"] == "single":
@@ -216,10 +268,19 @@ def gacha_row():
     for key, item in pool_roll_data.items():
         pool_roll_data[key] = int(pool_roll_data[key])
     cur.close()
-    items = items[:-1]
-    items.append(times["sim_index"])
-    items.append(pool_roll_data)
-    return jsonify(items)
+    items = items[:-2]
+    info["data"] = items
+    info["total"] = times["sim_index"]
+    info["report"] = pool_roll_data
+    return jsonify(info)
+
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    if os.path.isfile(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    return render_template("index.html")
 
 
 if __name__ == "__main__":

@@ -12,3 +12,19 @@
 
 至於圖片素材部分皆來自 [poswords/EliyaBot](https://github.com/poswords/EliyaBot)
 由於該專案沒有 license 所以就放在這邊備註
+
+# 前端
+## Project setup
+```
+npm install
+```
+
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+```
+npm run build
+```
