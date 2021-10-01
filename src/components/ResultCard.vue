@@ -4,7 +4,8 @@
       <v-row justify="center" :class="index === 0 ? 'mb-2 mt-1' : 'mb-2'"
              v-for="(row, index) in [3, 4, 3]" :key="`row_${index}_${row}`">
 
-         <character-icon v-for="n in row" :key="n"
+         <character-icon v-for="(n, row1) in row" :key="n"
+                          :class="row1 === 0 ? 'ml-0' : 'ml-3' "
                           :attri="result[index][n]? result[index][n].attri: ''"
                           :name="result[index][n]? result[index][n].name: ''"
                           :id="result[index][n]? result[index][n].id: ''"

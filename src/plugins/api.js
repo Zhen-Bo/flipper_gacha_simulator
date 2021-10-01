@@ -46,8 +46,14 @@ export default {
   getZoom (width) {
     console.log(width);
     switch (true) {
-      case width === 600:
+      case width >= 600:
         return 1.5;
+      case width >= 500:
+        return 1.2;
+      case width >= 400:
+        return 1;
+      default:
+        return 0.9;
     }
   },
   /**

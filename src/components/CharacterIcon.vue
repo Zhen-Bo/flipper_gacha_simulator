@@ -1,6 +1,6 @@
 <template>
   <v-card
-      class="pa-2 ml-3"
+      class="pa-2"
       outlined
       tile
       width="82px"
@@ -13,8 +13,6 @@
         :src="`https://raw.githubusercontent.com/Zhen-Bo/flipper_gacha_simulator/main/static/image/elements/element_${attriMapping[attri]}.png`"
         style="width: 20px; height: 20px;position: absolute; top: 0; right: 0;background-color:white;"
     />
-
-
   </div>
   </v-card>
 </template>
