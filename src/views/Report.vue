@@ -59,7 +59,7 @@ export default {
       lastUpdateTime: '',
       characterReportList: [[], [], [], [], [], []],
       tab: 5,
-      tabItems: [{ name: 5, text: '5 星' }, { name: 4, text: '4 星' }, { name: 3, text: '5 星' }]
+      tabItems: [{ name: 5, text: '5 星' }, { name: 4, text: '4 星' }, { name: 3, text: '3 星' }]
     };
   },
   methods: {
