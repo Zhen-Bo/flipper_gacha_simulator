@@ -12,8 +12,10 @@
                          color="primary"
                          fixed
                          grow
+                         max-width="600px"
+                         style="right: 0; margin: 0 auto !important;"
     >
-      <v-btn :value="item.value" class="font-weight-black" v-for="item in bottomNav" :key="item.value" :to="{name: item.value}" @click="$vuetify.goTo(0,{duration:10,easing:'easeInOutCubic'})">
+      <v-btn :value="item.value" class="font-weight-black"  v-for="item in bottomNav" :key="item.value" :to="{name: item.value}" @click="$vuetify.goTo(0,{duration:10,easing:'easeInOutCubic'})">
         <span>{{ item.name }}</span>
 
         <v-icon>{{ item.icon }}</v-icon>
@@ -49,7 +51,6 @@ export default {
 <style>
 .v-item-group.v-bottom-navigation .v-btn.v-size--default {
   height: inherit;
-  background: #fafafa;
   padding: 0 1.3rem;
 }
 </style>
