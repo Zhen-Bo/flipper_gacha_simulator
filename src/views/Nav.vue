@@ -1,19 +1,7 @@
 <template>
   <div>
-    <v-toolbar
-        color="primary"
-        dark
-        flat
-    >
-      <v-toolbar-title>彈射抽卡模擬</v-toolbar-title>
-
-      <v-spacer></v-spacer>
-      <v-btn icon href="https://github.com/Zhen-Bo/flipper_gacha_simulator/issues" target="_blank">
-        <v-icon>mdi-bug</v-icon>
-      </v-btn>
-
-      <template v-slot:extension>
         <v-tabs
+            dark
             v-model="tab"
             align-with-title
         >
@@ -26,8 +14,6 @@
             {{ item.text }}
           </v-tab>
         </v-tabs>
-      </template>
-    </v-toolbar>
     <v-tabs-items v-model="tab" class="grey lighten-3">
       <v-tab-item v-for="item in items" :key="item.name">
         <router-view :pool="item.name"></router-view>
