@@ -1,5 +1,5 @@
 <template>
-    <v-container class="mt-2 resultCard pa-1">
+    <v-container class="resultCard pa-1">
 
       <v-row justify="center" :class="index === 0 ? 'mb-2 mt-1' : 'mb-2'"
              v-for="(row, index) in [3, 4, 3]" :key="`row_${index}_${row}`">
