@@ -10,7 +10,7 @@ from flask import (
     Response,
     jsonify,
     abort,
-    send_from_directory
+    send_from_directory,
 )
 from datetime import datetime, timezone, timedelta
 import json
@@ -24,9 +24,7 @@ from datetime import date
 load_dotenv()
 
 # vue build file
-app = Flask(__name__,
-            static_folder="./dist",
-            template_folder="./templates")
+app = Flask(__name__, static_folder="./dist", template_folder="./templates")
 
 app.config.update(
     JSON_AS_ASCII=False,
@@ -52,15 +50,13 @@ limiter = flask_limiter.Limiter(
     app, key_func=limit_key_func, default_limits=["85 per minute"]
 )
 
-flipper_gacha_pool = gacha_pool(
-    os.path.join(app.config["DATA_FOLDER"], "flipper_pool")
-)
+flipper_gacha_pool = gacha_pool(os.path.join(app.config["DATA_FOLDER"], "flipper_pool"))
 
 # 可以改成讀取json
 pool_data_detal = {
     # "drawing_witch": {"name": "水炭池", "type": "normal"},#關閉水炭池
     # "Thunder-pu": {"name": "雷屬性精選", "type": "attribute"},#關閉雷PU
-    "machine_police_girl": {"name": "警察池", "type": "single"},
+    # "machine_police_girl": {"name": "警察池", "type": "single"},
     "halfanv": {"name": "半周年禮黑", "type": "three_pu"},
 }
 
@@ -75,7 +71,7 @@ def get_character(name):
         cursor.execute(f"SELECT * FROM `character`;")
         rs = cursor.fetchall()
         for row in rs:
-            character_list_temp[row['dev_id']] = row
+            character_list_temp[row["dev_id"]] = row
         cursor.close()
     return character_list_temp[name]
 
@@ -86,10 +82,13 @@ last_run_time = {}
 
 
 def get_character_report_temp(pool):
-    if pool not in character_report_temp or pool not in last_run_time \
-            or (datetime.now() - last_run_time[pool]).total_seconds() > 300:
+    if (
+        pool not in character_report_temp
+        or pool not in last_run_time
+        or (datetime.now() - last_run_time[pool]).total_seconds() > 300
+    ):
 
-        sql = f'''select a.id as id, sum(a.total) as total from (
+        sql = f"""select a.id as id, sum(a.total) as total from (
     select roll_1 as id, count(*) as total from {app.config['MYSQL_DB']}.{pool} group by roll_1
 UNION all
     select roll_2 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_2
@@ -109,17 +108,17 @@ UNION all
     select roll_9 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_9
 UNION all
     select roll_10 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_10) a
-group by a.id'''
+group by a.id"""
 
         cur = mysql.connection.cursor()
         cur.execute(sql)
         character_report_data = cur.fetchall()
         for row in character_report_data:
-            info = update_rarity_when_pu(pool, get_character(row['id']))
-            row['name'] = info['name']
-            row['attri'] = info['attri']
-            row['rarity'] = f"{info['rarity']}"
-            row['total'] = int(row['total'])
+            info = update_rarity_when_pu(pool, get_character(row["id"]))
+            row["name"] = info["name"]
+            row["attri"] = info["attri"]
+            row["rarity"] = f"{info['rarity']}"
+            row["total"] = int(row["total"])
 
         cur.close()
         last_run_time[pool] = datetime.now()
@@ -133,11 +132,6 @@ def check_pool(pool):
     return pool
 
 
-@app.errorhandler(404)
-def resource_not_found(e):
-    return jsonify(error=str(e)), 404
-
-
 def get_time():
     dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
     dt2 = dt1.astimezone(timezone(timedelta(hours=8)))  # 轉換時區 -> 東八區
@@ -146,9 +140,8 @@ def get_time():
 
 def update_rarity_when_pu(pool, info):
     if (
-            info["rarity"] == 5
-            and info["dev_id"]
-            in flipper_gacha_pool.char_list[pool]["5-pu"]
+        info["rarity"] == 5
+        and info["dev_id"] in flipper_gacha_pool.char_list[pool]["5-pu"]
     ):
         info["rarity"] = "5-pu"
     return info
@@ -163,14 +156,20 @@ def convert_to_character_output(char):
     }
 
 
+@app.errorhandler(404)
+@limiter.exempt
+def resource_not_found(e):
+    return jsonify(error=str(e)), 404
+
+
 @app.route("/result/pool_list")
+@limiter.exempt
 def get_pool_list():
-    if "ip_seed" not in session.keys():
-        session["ip_seed"] = 0
     return jsonify(pool_data_detal)
 
 
 @app.route("/result/roll_data")
+@limiter.exempt
 def get_pool_roll_data():
     pool = request.args.get("pool")
     sql = f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
@@ -192,12 +191,19 @@ def get_pool_roll_data():
 
 
 @app.route("/result/character_report")
+@limiter.exempt
 def character_report():
     pool = check_pool(request.args.get("pool"))
-    return jsonify({"report": get_character_report_temp(pool), "last_run_time": last_run_time[pool]})
+    return jsonify(
+        {
+            "report": get_character_report_temp(pool),
+            "last_run_time": last_run_time[pool],
+        }
+    )
 
 
 @app.route("/result")
+@limiter.exempt
 def search():
     pool = check_pool(request.args.get("pool"))
     roll = request.args.get("roll")
@@ -275,9 +281,12 @@ def gacha_row():
     return jsonify(info)
 
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+@limiter.exempt
 def catch_all(path):
+    if "ip_seed" not in session.keys():
+        session["ip_seed"] = 0
     if os.path.isfile(os.path.join(app.static_folder, path)):
         return send_from_directory(app.static_folder, path)
     return render_template("index.html")
