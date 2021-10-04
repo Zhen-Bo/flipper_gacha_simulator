@@ -4,7 +4,6 @@
     <v-main>
       <v-container style="max-width: 600px;background-color: #FFFFFF" class="pa-0">
         <router-view/>
-        <div style="height: 60px;"></div>
       </v-container>
     </v-main>
 
