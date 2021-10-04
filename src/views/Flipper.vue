@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card :min-height="(total === 0) ? $vuetify.breakpoint.height - 90: ''" class="background-image">
     <v-img :src='`${resourceURL}/static/image/pool_image/${pool}.png`' max-width="600px"
            :height="$vuetify.breakpoint.width / 1.9"
            max-height="315px"
@@ -17,8 +17,12 @@
 
     <result-card :character-list="result" :style="`zoom:${zoom}`"></result-card>
 
-    <v-img :src='require("..\\assets\\bg.jpg")'>
       <v-container class="justify-center mt-3">
+        <v-row class="align-center text-center">
+          <v-col cols="12" class="pt-0 pb-2" v-if="total > 0">
+          此結果為這個網站第 <span style="color: #ffcd76">{{ total }}</span> 次模擬
+          </v-col>
+        </v-row>
 
         <v-row class="justify-space-around mb-2">
 <!--          <v-btn text/>-->
@@ -32,15 +36,13 @@
 
         <v-row class="justify-center mb-3">
           <v-card max-width="600px"  width="100%" v-if="isRoll">
-            <v-card-text class="mb-0 pb-0">此結果為這個網站第 <span style="color: #ffcd76">{{ total }}</span> 次模擬
-            </v-card-text>
             <v-card-text>
               <star-report :desserts="desserts" :roll-total="rollTotal"/>
             </v-card-text>
           </v-card>
         </v-row>
+        <v-row style="height: 60px"></v-row>
       </v-container>
-    </v-img>
   </v-card>
 </template>
 
@@ -134,5 +136,12 @@ export default {
   .v-skeleton-loader__image {
     height: 100%;
   }
+}
+
+.background-image {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: bottom;
+  background-image: url($VUE_APP_RESOURCE_URL + '/static/bg.jpg');
 }
 </style>
