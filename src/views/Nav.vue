@@ -4,6 +4,7 @@
             dark
             v-model="tab"
             align-with-title
+            height="40"
         >
           <v-tabs-slider color="yellow"></v-tabs-slider>
 
