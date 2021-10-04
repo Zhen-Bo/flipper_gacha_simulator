@@ -139,7 +139,12 @@ export default {
   @include character-icon-border;
 }
 
-.character-icon-border-, .character-icon-border-4, .character-icon-border-3 {
+.character-icon-border-5,  .character-icon-border-4 {
+  border-color: #feca1e;
+  @include character-icon-border;
+}
+
+.character-icon-border-, .character-icon-border-3 {
   border-color: rgb(170, 170, 170);
   @include character-icon-border;
 }
