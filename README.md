@@ -1,6 +1,8 @@
-#彈射世界的模擬抽卡
-##[網站連結](https://paverschlev.link/):https://paverschlev.link/
-#####說明:彈射世界模擬抽卡網站
+# 彈射世界的模擬抽卡
+
+## [網站連結](https://paverschlev.link/):https://paverschlev.link/
+
+### 說明:彈射世界模擬抽卡網站
 
 ##Acknowledgements
 感謝
