@@ -18,3 +18,7 @@ class PrefixMiddleware(object):
 
 
 app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix="/wf")
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
