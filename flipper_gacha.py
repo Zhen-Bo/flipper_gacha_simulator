@@ -16,8 +16,9 @@ from datetime import datetime, timezone, timedelta
 import json
 import random
 import time
-from flask_mysqldb import MySQL, MySQLdb
 import flask_limiter
+import redis
+from flask_mysqldb import MySQL, MySQLdb
 from gacha import gacha_pool
 from datetime import date
 
@@ -41,15 +42,17 @@ app.config.update(
 )
 mysql = MySQL(app)
 
-
+# 取得使用者IP
 def limit_key_func():
     return str(request.headers.get("X-Forwarded-For", "127.0.0.1")).split(",")[0]
 
 
+# 設定flask-limiter
 limiter = flask_limiter.Limiter(
     app, key_func=limit_key_func, default_limits=["85 per minute"]
 )
 
+# 初始化卡池資料
 flipper_gacha_pool = gacha_pool(os.path.join(app.config["DATA_FOLDER"], "flipper_pool"))
 
 # 可以改成讀取json
@@ -60,20 +63,27 @@ pool_data_detal = {
     "halfanv": {"name": "半周年禮黑", "type": "three_pu"},
 }
 
+# 連接redis
+redis_pool = redis.ConnectionPool(host="localhost", port=6379, decode_responses=True)
+redis_data = redis.Redis(connection_pool=redis_pool)
+
 # Add character temp
-character_list_temp = {}
 
 
 def get_character(name):
-    global character_list_temp
-    if not bool(character_list_temp):
+    try:
+        return json.loads(redis_data.get("character_info"))[name]
+    except:
         cursor = mysql.connection.cursor()
         cursor.execute(f"SELECT * FROM `character`;")
         rs = cursor.fetchall()
-        for row in rs:
-            character_list_temp[row["dev_id"]] = row
         cursor.close()
-    return character_list_temp[name]
+        character_info = {}
+        for row in rs:
+            character_info[row["dev_id"]] = row
+        redis_data.set("character_info", json.dumps(character_info))
+        redis_data.expire("character_info", 86400)
+        return character_info[name]
 
 
 # Add character temp
@@ -82,48 +92,31 @@ last_run_time = {}
 
 
 def get_character_report_temp(pool):
-    if (
-        pool not in character_report_temp
-        or pool not in last_run_time
-        or (datetime.now() - last_run_time[pool]).total_seconds() > 300
-    ):
-
-        sql = f"""select a.id as id, sum(a.total) as total from (
-    select roll_1 as id, count(*) as total from {app.config['MYSQL_DB']}.{pool} group by roll_1
-UNION all
-    select roll_2 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_2
-UNION all
-   select roll_3 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_3
- UNION all
-    select roll_4 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_4
-UNION all
-    select roll_5 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_5
- UNION all
-    select roll_6 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_6
-UNION all
-    select roll_7 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_7
-UNION all
-    select roll_8 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_8
-UNION all
-    select roll_9 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_9
-UNION all
-    select roll_10 as id, count(*) as total  from {app.config['MYSQL_DB']}.{pool} group by roll_10) a
-group by a.id"""
-
+    pool_record = redis_data.get(f"{pool}_record")
+    if pool_record is None:
+        sql = f"SELECT dev_id AS id, COUNT(*) AS total FROM `{pool}_roll` GROUP BY dev_id ORDER BY dev_id ASC"
         cur = mysql.connection.cursor()
         cur.execute(sql)
         character_report_data = cur.fetchall()
+        cur.close()
+        character_list = redis_data.get("character_list")
         for row in character_report_data:
-            info = update_rarity_when_pu(pool, get_character(row["id"]))
+            info = get_character(row["id"])
             row["name"] = info["name"]
             row["attri"] = info["attri"]
-            row["rarity"] = f"{info['rarity']}"
             row["total"] = int(row["total"])
-
-        cur.close()
-        last_run_time[pool] = datetime.now()
-        character_report_temp[pool] = character_report_data
-    return character_report_temp[pool]
+            if (
+                info["rarity"] == "5"
+                and info["dev_id"] in flipper_gacha_pool.char_list[pool]["5-pu"]
+            ):
+                row["rarity"] = "5-pu"
+            else:
+                row["rarity"] = "5"
+        # redis_data.set(f"{pool}_record", json.dumps(character_report_data))
+        # redis_data.expire(f"{pool}_record", 60)
+        return character_report_data
+    else:
+        return json.loads(pool_record)
 
 
 def check_pool(pool):
@@ -138,13 +131,13 @@ def get_time():
     return dt2.strftime("%Y-%m-%d %H:%M:%S")
 
 
-def update_rarity_when_pu(pool, info):
-    if (
-        info["rarity"] == 5
-        and info["dev_id"] in flipper_gacha_pool.char_list[pool]["5-pu"]
-    ):
-        info["rarity"] = "5-pu"
-    return info
+# def update_rarity_when_pu(pool, info):
+#     if (
+#         info["rarity"] == "5"
+#         and info["dev_id"] in flipper_gacha_pool.char_list[pool]["5-pu"]
+#     ):
+#         info["rarity"] = "5-pu"
+#     return info
 
 
 def convert_to_character_output(char):
@@ -172,7 +165,7 @@ def get_pool_list():
 @limiter.exempt
 def get_pool_roll_data():
     pool = request.args.get("pool")
-    sql = f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
+    sql = f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}_record`;"
     cur = mysql.connection.cursor()
     cur.execute(sql)
     pool_roll_data = cur.fetchone()
@@ -197,7 +190,7 @@ def character_report():
     return jsonify(
         {
             "report": get_character_report_temp(pool),
-            "last_run_time": last_run_time[pool],
+            # "last_run_time": last_run_time[pool],
         }
     )
 
@@ -261,12 +254,32 @@ def gacha_row():
         items = flipper_gacha_pool.gacha_attribute(pool, 10)
     else:
         abort(404)
-    sql = f"INSERT INTO `{app.config['MYSQL_DB']}`.`{pool}` (`roll_1`, `roll_2`, `roll_3`, `roll_4`, `roll_5`, `roll_6`, `roll_7`, `roll_8`, `roll_9`, `roll_10`, `five_count`, `four_count`, `three_count`, `seed`, `ip`, `time`) VALUES ('{items[0]['id']}', '{items[1]['id']}', '{items[2]['id']}', '{items[3]['id']}', '{items[4]['id']}', '{items[5]['id']}', '{items[6]['id']}', '{items[7]['id']}', '{items[8]['id']}', '{items[9]['id']}', '{items[10]['5星']}', '{items[10]['4星']}', '{items[10]['3星']}', '{items[11]}','{client_ip}','{now}');"
+    sql = f"""INSERT INTO `{pool}_record` (`five_count`, `four_count`, `three_count`, `seed`, `ip`, `time`) 
+                VALUES ('{items[10]['5星']}', '{items[10]['4星']}', '{items[10]['3星']}', '{items[11]}','{client_ip}','{now}');"""
     cur = mysql.connection.cursor()
     cur.execute(sql)
     mysql.connection.commit()
-    cur.execute(f"SELECT sim_index FROM `{pool}` ORDER BY sim_index DESC LIMIT 1")
-    times = cur.fetchone()
+    times = cur.lastrowid
+    sql = f"""INSERT INTO `{pool}_roll`
+                VALUES 
+                ({times},'{items[0]['id']}'),
+                ({times},'{items[1]['id']}'),
+                ({times},'{items[2]['id']}'),
+                ({times},'{items[3]['id']}'),
+                ({times},'{items[4]['id']}'),
+                ({times},'{items[5]['id']}'),
+                ({times},'{items[6]['id']}'),
+                ({times},'{items[7]['id']}'),
+                ({times},'{items[8]['id']}'),
+                ({times},'{items[9]['id']}')"""
+    cur.execute(sql)
+    mysql.connection.commit()
+    try:
+        record = json.loads(redis_data.get(f"{pool}_record"))
+    except:
+        get_character_report_temp(pool)
+    for i in range(0, 10):
+        pass
     cur.execute(
         f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
     )
@@ -276,7 +289,7 @@ def gacha_row():
     cur.close()
     items = items[:-2]
     info["data"] = items
-    info["total"] = times["sim_index"]
+    info["total"] = times
     info["report"] = pool_roll_data
     return jsonify(info)
 
@@ -290,5 +303,3 @@ def catch_all(path):
     if os.path.isfile(os.path.join(app.static_folder, path)):
         return send_from_directory(app.static_folder, path)
     return render_template("index.html")
-
-
