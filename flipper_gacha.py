@@ -60,7 +60,7 @@ pool_data_detal = {
     # "drawing_witch": {"name": "水炭池", "type": "normal"},#關閉水炭池
     # "Thunder-pu": {"name": "雷屬性精選", "type": "attribute"},#關閉雷PU
     # "machine_police_girl": {"name": "警察池", "type": "single"},
-    "halfanv": {"name": "半周年禮黑", "type": "three_pu"},
+    # "halfanv": {"name": "半周年禮黑", "type": "three_pu"},
     "light-pu": {"name": "光屬性精選", "type": "attribute"},
 }
 
