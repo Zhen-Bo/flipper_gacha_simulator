@@ -61,6 +61,7 @@ pool_data_detal = {
     # "Thunder-pu": {"name": "雷屬性精選", "type": "attribute"},#關閉雷PU
     # "machine_police_girl": {"name": "警察池", "type": "single"},
     "halfanv": {"name": "半周年禮黑", "type": "three_pu"},
+    "light-pu": {"name": "光屬性精選", "type": "attribute"},
 }
 
 # 連接redis
@@ -75,12 +76,12 @@ def get_character(name):
         return json.loads(redis_data.get("character_info"))[name]
     except:
         cursor = mysql.connection.cursor()
-        cursor.execute(f"SELECT * FROM `character`;")
+        cursor.execute(f"SELECT dev_id AS id,name,rarity,attri FROM `character`;")
         rs = cursor.fetchall()
         cursor.close()
         character_info = {}
         for row in rs:
-            character_info[row["dev_id"]] = row
+            character_info[row["id"]] = row
         redis_data.set("character_info", json.dumps(character_info))
         redis_data.expire("character_info", 86400)
         return character_info[name]
@@ -91,32 +92,71 @@ character_report_temp = {}
 last_run_time = {}
 
 
-def get_character_report_temp(pool):
+def set_redis_record(pool):
+    # pool_record = redis_data.get(f"{pool}_record")
+    cur = mysql.connection.cursor()
+    cur.execute(
+        f"SELECT dev_id AS id,name,rarity,attri FROM `character` ORDER BY id ASC;"
+    )
+    rs = cur.fetchall()
+
+    cur.execute(
+        f"SELECT dev_id AS id, COUNT(*) AS total FROM `{pool}_roll` GROUP BY id ORDER BY id ASC"
+    )
+    character_report = cur.fetchall()
+    cur.close()
+    result_dict = {}
+    for row in rs:
+        try:
+            row["total"] = character_report[row["id"]]["total"]
+        except:
+            row["total"] = 0
+        finally:
+            if (
+                row["rarity"] == 5
+                and row["id"] in flipper_gacha_pool.char_list[pool]["5-pu"]
+            ):
+                row["rarity"] = "5-pu"
+            else:
+                row["rarity"] = str(row["rarity"])
+            result_dict[row["id"]] = row
+    redis_data.set(f"{pool}_record", json.dumps(result_dict), ex=180)
+    return result_dict
+
+
+def get_character_report_temp(pool, mode="list", action="get"):
     pool_record = redis_data.get(f"{pool}_record")
-    if pool_record is None:
-        sql = f"SELECT dev_id AS id, COUNT(*) AS total FROM `{pool}_roll` GROUP BY dev_id ORDER BY dev_id ASC"
+    if pool_record is None or action == "renew":
+        sql = f"SELECT dev_id AS id, COUNT(*) AS total FROM `{pool}_roll` GROUP BY id ORDER BY id ASC"
         cur = mysql.connection.cursor()
         cur.execute(sql)
         character_report_data = cur.fetchall()
         cur.close()
         character_list = redis_data.get("character_list")
+        temp_result = {}
         for row in character_report_data:
             info = get_character(row["id"])
-            row["name"] = info["name"]
-            row["attri"] = info["attri"]
-            row["total"] = int(row["total"])
+            # row["name"] = info["name"]
+            # row["attri"] = info["attri"]
+            info["total"] = int(row["total"])
             if (
-                info["rarity"] == "5"
-                and info["dev_id"] in flipper_gacha_pool.char_list[pool]["5-pu"]
+                info["rarity"] == 5
+                and info["id"] in flipper_gacha_pool.char_list[pool]["5-pu"]
             ):
-                row["rarity"] = "5-pu"
+                info["rarity"] = "5-pu"
             else:
-                row["rarity"] = "5"
-        # redis_data.set(f"{pool}_record", json.dumps(character_report_data))
-        # redis_data.expire(f"{pool}_record", 60)
-        return character_report_data
+                info["rarity"] = str(info["rarity"])
+            temp_result[row["id"]] = info
+        redis_data.set(f"{pool}_record", json.dumps(temp_result), ex=180)
+        if mode == "list":
+            return list(temp_result.values())
+        else:
+            return temp_result
     else:
-        return json.loads(pool_record)
+        if mode == "list":
+            return list(json.loads(pool_record).values())
+        else:
+            return json.loads(pool_record)
 
 
 def check_pool(pool):
@@ -129,15 +169,6 @@ def get_time():
     dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
     dt2 = dt1.astimezone(timezone(timedelta(hours=8)))  # 轉換時區 -> 東八區
     return dt2.strftime("%Y-%m-%d %H:%M:%S")
-
-
-# def update_rarity_when_pu(pool, info):
-#     if (
-#         info["rarity"] == "5"
-#         and info["dev_id"] in flipper_gacha_pool.char_list[pool]["5-pu"]
-#     ):
-#         info["rarity"] = "5-pu"
-#     return info
 
 
 def convert_to_character_output(char):
@@ -187,12 +218,7 @@ def get_pool_roll_data():
 @limiter.exempt
 def character_report():
     pool = check_pool(request.args.get("pool"))
-    return jsonify(
-        {
-            "report": get_character_report_temp(pool),
-            # "last_run_time": last_run_time[pool],
-        }
-    )
+    return jsonify({"report": get_character_report_temp(pool)})
 
 
 @app.route("/result")
@@ -274,12 +300,15 @@ def gacha_row():
                 ({times},'{items[9]['id']}')"""
     cur.execute(sql)
     mysql.connection.commit()
+
     try:
         record = json.loads(redis_data.get(f"{pool}_record"))
     except:
-        get_character_report_temp(pool)
+        record = set_redis_record(pool)
     for i in range(0, 10):
-        pass
+        record[items[i]["id"]]["total"] += 1
+    redis_data.set(f"{pool}_record", json.dumps(record), ex=180)
+
     cur.execute(
         f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
     )
