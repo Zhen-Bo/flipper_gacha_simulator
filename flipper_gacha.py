@@ -310,7 +310,7 @@ def gacha_row():
     redis_data.set(f"{pool}_record", json.dumps(record), ex=180)
 
     cur.execute(
-        f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}`;"
+        f"SELECT SUM(five_count) AS all_five,SUM(four_count) AS all_four,SUM(three_count) AS all_three ,SUM(five_count)+SUM(four_count)+SUM(three_count) AS all_roll FROM `{pool}_record`;"
     )
     pool_roll_data = cur.fetchone()
     for key, item in pool_roll_data.items():
