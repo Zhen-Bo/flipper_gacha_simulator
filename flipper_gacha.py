@@ -25,7 +25,8 @@ from datetime import date
 load_dotenv()
 
 # vue build file
-app = Flask(__name__, static_folder="./dist", template_folder="./templates")
+# app = Flask(__name__, static_folder="./dist", template_folder="./templates")
+app = Flask(__name__)
 
 app.config.update(
     JSON_AS_ASCII=False,
@@ -87,11 +88,6 @@ def get_character(name):
         return character_info[name]
 
 
-# Add character temp
-character_report_temp = {}
-last_run_time = {}
-
-
 def set_redis_record(pool):
     # pool_record = redis_data.get(f"{pool}_record")
     cur = mysql.connection.cursor()
@@ -124,39 +120,39 @@ def set_redis_record(pool):
     return result_dict
 
 
-def get_character_report_temp(pool, mode="list", action="get"):
-    pool_record = redis_data.get(f"{pool}_record")
-    if pool_record is None or action == "renew":
-        sql = f"SELECT dev_id AS id, COUNT(*) AS total FROM `{pool}_roll` GROUP BY id ORDER BY id ASC"
-        cur = mysql.connection.cursor()
-        cur.execute(sql)
-        character_report_data = cur.fetchall()
-        cur.close()
-        character_list = redis_data.get("character_list")
-        temp_result = {}
-        for row in character_report_data:
-            info = get_character(row["id"])
-            # row["name"] = info["name"]
-            # row["attri"] = info["attri"]
-            info["total"] = int(row["total"])
-            if (
-                info["rarity"] == 5
-                and info["id"] in flipper_gacha_pool.char_list[pool]["5-pu"]
-            ):
-                info["rarity"] = "5-pu"
-            else:
-                info["rarity"] = str(info["rarity"])
-            temp_result[row["id"]] = info
-        redis_data.set(f"{pool}_record", json.dumps(temp_result), ex=180)
-        if mode == "list":
-            return list(temp_result.values())
-        else:
-            return temp_result
-    else:
-        if mode == "list":
-            return list(json.loads(pool_record).values())
-        else:
-            return json.loads(pool_record)
+# def get_character_report_temp(pool, mode="list", action="get"):
+#     pool_record = redis_data.get(f"{pool}_record")
+#     if pool_record is None or action == "renew":
+#         sql = f"SELECT dev_id AS id, COUNT(*) AS total FROM `{pool}_roll` GROUP BY id ORDER BY id ASC"
+#         cur = mysql.connection.cursor()
+#         cur.execute(sql)
+#         character_report_data = cur.fetchall()
+#         cur.close()
+#         character_list = redis_data.get("character_list")
+#         temp_result = {}
+#         for row in character_report_data:
+#             info = get_character(row["id"])
+#             # row["name"] = info["name"]
+#             # row["attri"] = info["attri"]
+#             info["total"] = int(row["total"])
+#             if (
+#                 info["rarity"] == 5
+#                 and info["id"] in flipper_gacha_pool.char_list[pool]["5-pu"]
+#             ):
+#                 info["rarity"] = "5-pu"
+#             else:
+#                 info["rarity"] = str(info["rarity"])
+#             temp_result[row["id"]] = info
+#         redis_data.set(f"{pool}_record", json.dumps(temp_result), ex=180)
+#         if mode == "list":
+#             return list(temp_result.values())
+#         else:
+#             return temp_result
+#     else:
+#         if mode == "list":
+#             return list(json.loads(pool_record).values())
+#         else:
+#             return json.loads(pool_record)
 
 
 def check_pool(pool):
@@ -218,7 +214,11 @@ def get_pool_roll_data():
 @limiter.exempt
 def character_report():
     pool = check_pool(request.args.get("pool"))
-    return jsonify({"report": get_character_report_temp(pool)})
+    try:
+        record = json.loads(redis_data.get(f"{pool}_record"))
+    except:
+        record = set_redis_record(pool)
+    return jsonify({"report": list(record.values())})
 
 
 @app.route("/result")
