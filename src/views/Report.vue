@@ -7,7 +7,7 @@
     </v-card>
 
     <v-card class="mt-2">
-      <v-card-title class="pb-0">角色出貸統計</v-card-title>
+      <v-card-title class="pb-0">角色出貨統計</v-card-title>
       <v-card-text class="pl-0 pr-0">
         <v-tabs
             v-model="tab"
@@ -76,9 +76,9 @@ export default {
   created () {
     API.report(this.pool).then((rs) => {
       this.rollDesserts = [
-        { title: '總出貸次數', star5_up: '0', star5: rs.all_five, star4: rs.all_four, star3: rs.all_three },
+        { title: '總出貨次數', star5_up: '0', star5: rs.all_five, star4: rs.all_four, star3: rs.all_three },
         {
-          title: '總出貸機率',
+          title: '總出貨機率',
           star5_up: '0',
           star5: `${API.round(rs.all_five / rs.all_roll)}%`,
           star4: `${API.round(rs.all_four / rs.all_roll)}%`,
