@@ -100,14 +100,12 @@ def set_redis_record(pool):
         f"SELECT dev_id AS id, COUNT(*) AS total FROM `{pool}_roll` GROUP BY id ORDER BY id ASC"
     )
     character_report = cur.fetchall()
-    print(character_report)
     cur.close()
     result_dict = {}
     count_dict = {}
     for row in character_report:
         count_dict[row["id"]] = row
     for row in rs:
-        print(count_dict[row["id"]])
         try:
             row["total"] = count_dict[row["id"]]["total"]
         except:
