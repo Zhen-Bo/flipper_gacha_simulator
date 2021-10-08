@@ -6,6 +6,7 @@ import os
 
 class gacha_pool:
     def __init__(self, pool_path):
+        os.system("redis-cli flushall")
         self.char_list = self.read_list(pool_path)
 
     def read_list(self, pool_path):
