@@ -236,18 +236,20 @@ def search():
         abort(404)
 
     cur = mysql.connection.cursor()
-    cur.execute(f"SELECT * FROM `{pool}` WHERE sim_index = {roll};")
-    result = cur.fetchone()
+    cur.execute(f"SELECT * FROM `{pool}_roll` WHERE sim_index = {roll};")
+    result = list(cur.fetchall())
     cur.close()
+
+    try:
+        record = json.loads(redis_data.get(f"{pool}_record"))
+    except:
+        record = set_redis_record(pool)
 
     if result is not None:
         detail = []
-
-        for index in range(1, 11):
-            key = f"roll_{index}"
-            info = update_rarity_when_pu(pool, get_character(result[key]))
-            detail.append(convert_to_character_output(info))
-        return jsonify({"data": detail, "sim_index": result["sim_index"]})
+        for roll_data in result:
+            detail.append(record[roll_data["dev_id"]])
+        return jsonify({"data": detail, "sim_index": roll})
     else:
         abort(404, description="記錄不存在!")
 
