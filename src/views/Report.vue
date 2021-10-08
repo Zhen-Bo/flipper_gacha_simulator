@@ -56,11 +56,15 @@ export default {
     };
   },
   methods: {
-    /** @param {array<character & {total:number}>} list */
-    countRate(list, total) {
-      // let total = list.map((rs) => rs.total).reduce((a, b) => a + b);
+    /** @param {array<character & {total:number}>} list
+     * @param {number} total_pool
+     */
+    countRate (list, total_pool) {
+      let total_star = list.map((rs) => rs.total).reduce((a, b) => a + b);
+
       list.forEach((rs) => {
-        rs.rate = `${API.round(rs.total / total)}%`;
+        rs.rate_star = `${API.round(rs.total / total_star)}%`;
+        rs.rate_pool = `${API.round(rs.total / total_pool)}%`;
       });
       return list;
     },
@@ -86,24 +90,25 @@ export default {
     });
 
     API.getCharacterReport(this.pool).then((rs) => {
-      let total = rs.report.map((rs) => rs.total).reduce((a, b) => a + b);
+      let total_pool = rs.report.map((rs) => rs.total).reduce((a, b) => a + b);
+
       this.characterReportList = [
         [],
         [],
         [],
         this.countRate(
           rs.report.filter((rs) => rs.rarity === "3" && rs.total !== 0),
-          total
+          total_pool
         ),
         this.countRate(
           rs.report.filter((rs) => rs.rarity === "4" && rs.total !== 0),
-          total
+          total_pool
         ),
         this.countRate(
           rs.report.filter(
             (rs) => (rs.rarity === "5" || rs.rarity === "5-pu") && rs.total !== 0
           ),
-          total
+          total_pool
         ),
       ];
     });

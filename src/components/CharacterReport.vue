@@ -43,7 +43,8 @@ export default {
         },
         { text: '名稱', value: 'name' },
         { text: '總次數', value: 'total' },
-        { text: '總機率', value: 'rate' },
+        { text: '總機率 (星)', value: 'rate_star' },
+        { text: '總機率 (池)', value: 'rate_pool' },
       ],
     };
   },
