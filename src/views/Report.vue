@@ -92,16 +92,16 @@ export default {
         [],
         [],
         this.countRate(
-          rs.report.filter((rs) => rs.rarity === "3" && rs.total != 0),
+          rs.report.filter((rs) => rs.rarity === "3" && rs.total !== 0),
           total
         ),
         this.countRate(
-          rs.report.filter((rs) => rs.rarity === "4" && rs.total != 0),
+          rs.report.filter((rs) => rs.rarity === "4" && rs.total !== 0),
           total
         ),
         this.countRate(
           rs.report.filter(
-            (rs) => (rs.rarity === "5" || rs.rarity === "5-pu") && rs.total != 0
+            (rs) => (rs.rarity === "5" || rs.rarity === "5-pu") && rs.total !== 0
           ),
           total
         ),
