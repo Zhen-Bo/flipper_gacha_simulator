@@ -4,7 +4,7 @@
 
 ### 說明:彈射世界模擬抽卡網站
 
-##Acknowledgements
+## Acknowledgements
 感謝
  - [poswords/EliyaBot](https://github.com/poswords/EliyaBot) 圖片來源
  - [bell-rabbit](https://github.com/bell-rabbit) 製作Vue前端及後端微調
