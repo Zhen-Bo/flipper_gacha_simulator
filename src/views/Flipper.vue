@@ -26,7 +26,7 @@
 
         <v-row class="justify-space-around mb-2">
 <!--          <v-btn text/>-->
-          <roll-button @click="roll"/>
+          <roll-button @click="roll" :disabled="disabledRoll" :loading="disabledRoll"/>
 <!--          <v-btn height="64px">-->
 <!--            <v-icon>-->
 <!--              mdi-share-variant-->
@@ -70,11 +70,13 @@ export default {
       desserts: [],
       rollTotal: 0,
       zoom: API.getZoom(this.$vuetify.breakpoint.width),
-      load: true
+      load: true,
+      disabledRoll: false
     };
   },
   methods: {
     roll () {
+      this.disabledRoll = true;
       API.roll(this.pool).then((rs) => {
         let report = { '3': 0, '4': 0, '5': 0, '5-pu': 0 };
         let count = this.desserts[1] ? this.desserts[1] : { title: '總數目', star5_up: 0, star5: 0, star4: 0, star3: 0 };
@@ -107,6 +109,9 @@ export default {
         this.isRoll = true;
 
         this.saveHistory(rs.data);
+
+        setTimeout(() => this.disabledRoll = false, 800);
+
       });
     },
     saveHistory (data) {
