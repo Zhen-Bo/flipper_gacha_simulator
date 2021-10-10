@@ -269,6 +269,8 @@ def gacha_row():
                 ip_slice = client_ip.split(":")
             ip_seed = 0
             for num in ip_slice:
+                if num == "":
+                    continue
                 ip_seed += int(num[0], 16)
         else:
             return "請使用瀏覽器進行模擬抽卡\n如有疑慮請截圖後到巴哈主串附圖回報"
