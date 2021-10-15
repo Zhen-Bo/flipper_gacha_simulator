@@ -62,7 +62,7 @@ pool_data_detal = {
     # "Thunder-pu": {"name": "雷屬性精選", "type": "attribute"},#關閉雷PU
     # "machine_police_girl": {"name": "警察池", "type": "single"},
     # "halfanv": {"name": "半周年禮黑", "type": "three_pu"},
-    "light-pu": {"name": "光屬性精選", "type": "attribute"},
+    # "light-pu": {"name": "光屬性精選", "type": "attribute"},
     "fire-pu": {"name": "火屬性精選", "type": "attribute"},
     "princess": {"name": "公主焊接", "type": "three_pu"},
 }
