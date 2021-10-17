@@ -37,8 +37,9 @@ export default {
   created () {
     Api.pool().then((rs) => {
       for (let rsKey in rs) {
+        console.log(rsKey);
         let data = rs[rsKey];
-        this.items.unshift({ name: rsKey, text: data.name, type: data.type });
+        this.items.push({ name: rsKey, text: data.name, type: data.type });
       }
     });
   }
