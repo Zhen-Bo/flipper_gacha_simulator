@@ -223,26 +223,12 @@ def gacha_row():
     info = {}
     pool = request.args.get("pool")
     ignore = request.args.get("ignore")
+    header_referer = request.referrer
+    if header_referer != "https://www.paverschlev.link/wf/flipper":
+        return "請使用瀏覽器進行模擬抽卡\n如有疑慮請截圖後到巴哈主串附圖回報"
     if pool not in pool_data_detal.keys() or pool is None or pool == "":
         pool = list(pool_data_detal)[0]
     now = get_time()
-    if ignore != os.getenv("IGNORE_TOKEN"):
-        client_ip = limit_key_func()
-        if "ip_seed" in session.keys():
-            if "." in client_ip:
-                ip_slice = client_ip.split(".")
-            elif ":" in client_ip:
-                ip_slice = client_ip.split(":")
-            ip_seed = 0
-            for num in ip_slice:
-                if num == "":
-                    continue
-                ip_seed += int(num[0], 16)
-        else:
-            return "請使用瀏覽器進行模擬抽卡\n如有疑慮請截圖後到巴哈主串附圖回報"
-        session["ip_seed"] = ip_seed
-    else:
-        client_ip = "ignore_token"
     if pool_data_detal[pool]["type"] == "normal":
         items = flipper_gacha_pool.gacha(pool, 10)
     elif pool_data_detal[pool]["type"] == "single":
@@ -300,8 +286,4 @@ def gacha_row():
 @app.route("/<path:path>")
 @limiter.exempt
 def catch_all(path):
-    if "ip_seed" not in session.keys():
-        session["ip_seed"] = 0
-    if os.path.isfile(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
     return render_template("index.html")
