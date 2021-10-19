@@ -240,7 +240,7 @@ def gacha_row():
     else:
         abort(404)
     sql = f"""INSERT INTO `{pool}_record` (`five_count`, `four_count`, `three_count`, `seed`, `ip`, `time`) 
-                VALUES ('{items[10]['5星']}', '{items[10]['4星']}', '{items[10]['3星']}', '{items[11]}','{client_ip}','{now}');"""
+                VALUES ('{items[10]['5星']}', '{items[10]['4星']}', '{items[10]['3星']}', '{items[11]}','{limit_key_func()}','{now}');"""
     cur = mysql.connection.cursor()
     cur.execute(sql)
     mysql.connection.commit()
