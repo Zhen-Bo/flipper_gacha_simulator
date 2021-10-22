@@ -63,7 +63,7 @@ pool_data_detal = {
     # "machine_police_girl": {"name": "警察池", "type": "single"},
     # "halfanv": {"name": "半周年禮黑", "type": "three_pu"},
     # "light-pu": {"name": "光屬性精選", "type": "attribute"},
-    "fire-pu": {"name": "火屬性精選", "type": "attribute"},
+    # "fire-pu": {"name": "火屬性精選", "type": "attribute"},
     "princess": {"name": "公主連結", "type": "three_pu"},
     "summer1": {"name": "泳裝1期", "type": "normal"},
     "summer2": {"name": "泳裝2期", "type": "normal"},
