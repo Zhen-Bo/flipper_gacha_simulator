@@ -67,6 +67,7 @@ pool_data_detal = {
     # "princess": {"name": "公主連結", "type": "three_pu"},
     "summer1": {"name": "泳裝1期", "type": "normal"},
     "summer2": {"name": "泳裝2期", "type": "normal"},
+    "summer3": {"name": "泳裝3期", "type": "normal"},
 }
 
 # 連接redis
