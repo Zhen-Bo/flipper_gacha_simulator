@@ -65,9 +65,10 @@ pool_data_detal = {
     # "light-pu": {"name": "光屬性精選", "type": "attribute"},
     # "fire-pu": {"name": "火屬性精選", "type": "attribute"},
     # "princess": {"name": "公主連結", "type": "three_pu"},
-    "summer1": {"name": "泳裝1期", "type": "normal"},
-    "summer2": {"name": "泳裝2期", "type": "normal"},
-    "summer3": {"name": "泳裝3期", "type": "normal"},
+    # "summer1": {"name": "泳裝1期", "type": "normal"},
+    # "summer2": {"name": "泳裝2期", "type": "normal"},
+    # "summer3": {"name": "泳裝3期", "type": "normal"},
+    "water_prince": {"name": "水王子池", "type": "single"}
 }
 
 # 連接redis
@@ -80,7 +81,7 @@ def get_character(name):
         return json.loads(redis_data.get("character_info"))[name]
     except:
         cursor = mysql.connection.cursor()
-        cursor.execute(f"SELECT dev_id AS id,name,rarity,attri FROM `character`;")
+        cursor.execute(f"SELECT dev_id AS id,name,rarity,attri FROM `character_info`;")
         rs = cursor.fetchall()
         cursor.close()
         character_info = {}
@@ -94,7 +95,7 @@ def get_character(name):
 def set_redis_record(pool):
     cur = mysql.connection.cursor()
     cur.execute(
-        f"SELECT dev_id AS id,name,rarity,attri FROM `character` ORDER BY id ASC;"
+        f"SELECT dev_id AS id,name,rarity,attri FROM `character_info` ORDER BY id ASC;"
     )
     rs = cur.fetchall()
 
