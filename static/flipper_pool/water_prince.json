@@ -1,6 +1,6 @@
 {
     "five_pu": [
-        {"name":"拉傑爾特(夏日)","id":"prince_zero_smr20","attri":"Water","rarity":"5","type":"限定"}
+        {"name":"拉傑爾特(夏日)","id":"prince_zero_smr20","attri":"Water","rarity":"5-pu","type":"限定"}
     ],
     "5-pu":[
         "prince_zero_smr20"
