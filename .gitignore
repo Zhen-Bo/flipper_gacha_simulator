@@ -1,6 +1,7 @@
 #userfile
 test.py
 log/
+table_template.sql
 # Byte-compiled / optimized / DLL files
 tempCodeRunnerFile.py
 .vscode

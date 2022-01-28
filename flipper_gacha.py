@@ -68,7 +68,8 @@ pool_data_detal = {
     # "summer1": {"name": "泳裝1期", "type": "normal"},
     # "summer2": {"name": "泳裝2期", "type": "normal"},
     # "summer3": {"name": "泳裝3期", "type": "normal"},
-    "water_prince": {"name": "水王子池", "type": "single"}
+    # "water_prince": {"name": "水王子池", "type": "single"},
+    "before_1nv": {"name": "禮機池", "type": "single"}
 }
 
 # 連接redis
