@@ -69,7 +69,8 @@ pool_data_detal = {
     # "summer2": {"name": "泳裝2期", "type": "normal"},
     # "summer3": {"name": "泳裝3期", "type": "normal"},
     # "water_prince": {"name": "水王子池", "type": "single"},
-    "before_1nv": {"name": "禮機池", "type": "single"}
+    "before_1nv": {"name": "禮機池", "type": "single"},
+    "1nv": {"name": "1周年三巨頭", "type": "1nv"},
 }
 
 # 連接redis
@@ -240,6 +241,8 @@ def gacha_row():
         items = flipper_gacha_pool.gacha_three(pool, 10)
     elif pool_data_detal[pool]["type"] == "attribute":
         items = flipper_gacha_pool.gacha_attribute(pool, 10)
+    elif pool_data_detal[pool]["type"] == "1nv":
+        items = flipper_gacha_pool.gacha_1nv(pool, 10)
     else:
         abort(404)
     sql = f"""INSERT INTO `{pool}_record` (`five_count`, `four_count`, `three_count`, `seed`, `ip`, `time`) 

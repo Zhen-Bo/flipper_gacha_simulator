@@ -211,3 +211,48 @@ class gacha_pool:
         items.append(info)
         items.append(rnd_seed)
         return items
+
+    def gacha_1nv(self, pool, amount):
+        if amount > 10:
+            amount = 10
+        info = {"5星": 0, "4星": 0, "3星": 0}
+        rnd_seed = round(time.time(), 3)
+        random.seed(rnd_seed)
+        items = []
+        for i in range(amount):
+            rnd = random.randint(0, 1000000)
+            if i != amount - 1:
+                if rnd >= 0 and rnd <= 21000:
+                    item = random.choice(self.char_list[pool]["five_pu"])
+                    info["5星"] += 1
+                elif rnd > 21000 and rnd <= 50000:
+                    item = random.choice(self.char_list[pool]["five"])
+                    info["5星"] += 1
+                elif rnd > 50000 and rnd <= 90000:
+                    item = random.choice(self.char_list[pool]["four_pu"])
+                    info["4星"] += 1
+                elif rnd > 90000 and rnd <= 300000:
+                    item = random.choice(self.char_list[pool]["four"])
+                    info["4星"] += 1
+                elif rnd > 300000 and rnd <= 1000000:
+                    item = random.choice(self.char_list[pool]["three"])
+                    info["3星"] += 1
+            else:
+                if rnd >= 0 and rnd <= 20000:
+                    item = random.choice(self.char_list[pool]["five_pu"])
+                    info["5星"] += 1
+                elif rnd > 20000 and rnd <= 50000:
+                    item = random.choice(self.char_list[pool]["five"])
+                    info["5星"] += 1
+                elif rnd > 50000 and rnd <= 202040:
+                    item = random.choice(self.char_list[pool]["four_pu"])
+                    info["4星"] += 1
+                elif rnd > 202040 and rnd <= 1000000:
+                    item = random.choice(self.char_list[pool]["four"])
+                    info["4星"] += 1
+            items.append(item)
+        for i in range(10 - amount):
+            items.append("")
+        items.append(info)
+        items.append(rnd_seed)
+        return items
